@@ -77,11 +77,6 @@
 //                }
 //                self.$apply()
 //            })
-            let params={
-                url:URI.setPhoneNumber, //自己服务器维护用户登录状态地址
-                data:{a:1,b:2},
-            }
-            wepy.request(params);
         }
         onShareAppMessage() {
             return {
@@ -96,18 +91,19 @@
             }
         }
         async tapJoin(){
-            await this.$parent.checkLoginState();
+            //await this.$parent.checkLoginState();
             wepy.navigateTo({
                 url: '../address'
             })
         }
         methods = {
             handlerGetPhone(res){
-                console.log(res)
+                console.log(res);
+                this.tapJoin();
                 if(res.detail.errMsg="getPhoneNumber:ok"){
                     let params={
                         url:URI.setPhoneNumber, //自己服务器维护用户登录状态地址
-                        data:res,
+                        data:res.detail,
                     }
                     wepy.request(params);
                 }

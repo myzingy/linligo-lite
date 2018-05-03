@@ -12,5 +12,5 @@ export default {
     user:{act:'user',code:'10000',type:'GET',timeout:0},
     refreshToken:{act:'wxuser/refreshToken',code:'10001',type:'POST',timeout:0},
     miniLogin:{act:'wxuser/miniLogin',code:'10002',type:'GET',timeout:0},
-    setPhoneNumber:{act:'wxuser/setPhoneNumber',code:'10003',type:'GET',timeout:0},
+    setPhoneNumber:{act:'wxuser/setPhoneNumber',code:'10003',type:'POST',timeout:0},
 }

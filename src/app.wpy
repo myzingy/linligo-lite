@@ -48,7 +48,7 @@
                     if(typeof p.url.type!='undefined' && !p.method){
                         p.method=p.url.type;
                     }
-                    console.log('config request: ', p.url);
+                    //console.log('config request: ', p.url);
                     p.url=URI.cgi(p.url);
 
                     let  Bearer = wx.getStorageSync('access_token')
@@ -57,7 +57,7 @@
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     }
-                    console.log('config request: ', arguments);
+                    console.log('config request: ', p.url,p.data);
                     // 必须返回OBJECT参数对象，否则无法发送请求到服务端
                     return p;
                 },
