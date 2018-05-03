@@ -17,6 +17,7 @@
     export default class extends wepy.app {
         config = {
             pages: [
+                'pages/purchase/new',
                 'pages/purchase/info',
                 'pages/index',
                 'pages/address',
@@ -268,6 +269,34 @@
             } catch (res) {
 
             }
+
+        }
+        authSetting(){
+            let that=this;
+            return new Promise(function (resole,reject) {
+                wepy.showModal({
+                    title: '授权提示',
+                    content: '为方便使用，请授权小程序访问用户信息、地址信息以及电话',
+                }).then(function () {
+                    wepy.openSetting().then(function (res) {
+                        console.log('wepy.openSetting',res.authSetting);
+                        let scopeFlag=true;
+                        Object.keys(res.authSetting).forEach((scope) => {
+                            if(res.authSetting[scope]==false){
+                                scopeFlag=false;
+                                return false;
+                            }
+                        })
+                        if(!scopeFlag){
+                            that.authSetting();
+                        }
+                        resole();
+                    });
+                }).catch(function () {
+                    reject();
+                    that.authSetting();
+                });
+            });
 
         }
     }

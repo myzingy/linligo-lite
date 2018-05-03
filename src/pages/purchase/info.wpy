@@ -53,10 +53,15 @@
         <view class="flex-line">
             <view>佣金：<text style="color:firebrick;">3元</text></view>
             <view style="margin-left: 20rpx">状态：<text style="color:firebrick;">等待采购</text></view>
+            <view style="margin-left: 20rpx">配送：<text style="color:firebrick;">楼下自提/送到家</text></view>
         </view>
 
         <button type="warn" open-type="getPhoneNumber" bindgetphonenumber="handlerGetPhone">帮我也带些</button>
-        <button type="primary" open-type="share">转发到业主群</button>
+        <view class="flex-line">
+            <view><button type="warn" open-type="getPhoneNumber" bindgetphonenumber="handlerNewActivity">发起新采购</button></view>
+            <view><button type="primary" open-type="share">转发到业主群</button></view>
+        </view>
+
     </view>
 </template>
 <script>
@@ -96,18 +101,56 @@
                 url: '../address'
             })
         }
+        async setPhoneNumber(res){
+            console.log(res);
+            if(res.detail.errMsg="getPhoneNumber:ok"){
+                let params={
+                    url:URI.setPhoneNumber, //自己服务器维护用户登录状态地址
+                    data:res.detail,
+                }
+                wepy.request(params);
+            }
+        }
+        async chooseAddress(){
+            let that=this;
+            wepy.chooseAddress().then(function(res){
+                console.log('chooseAddress',res);
+            }).catch(function(){
+                wepy.showModal({
+                    title: '授权提示',
+                    content: '为方便使用，请授权小程序访问用户信息、地址信息以及电话',
+                }).then(function () {
+                    wepy.openSetting().then(function (res) {
+                        console.log('wepy.openSetting',res);
+                        res.authSetting.forEach(scope => {
+                            if(scope==false){
+                                wepy.showToast({
+                                    title: '未授权，无法使用',
+                                    icon: 'none',
+                                    duration: 5000
+                                })
+                            }
+                        })
+                    });
+                }).catch(function () {
+                    wepy.showToast({
+                        title: '未授权，无法继续',
+                        icon: 'none',
+                        duration: 5000
+                    })
+                });
+            })
+        }
         methods = {
             handlerGetPhone(res){
-                console.log(res);
-                this.tapJoin();
-                if(res.detail.errMsg="getPhoneNumber:ok"){
-                    let params={
-                        url:URI.setPhoneNumber, //自己服务器维护用户登录状态地址
-                        data:res.detail,
-                    }
-                    wepy.request(params);
-                }
-            }
+                this.setPhoneNumber();
+            },
+            handlerNewActivity(){
+                this.setPhoneNumber();
+                wepy.navigateTo({
+                    url: './new'
+                })
+            },
         }
     }
 
