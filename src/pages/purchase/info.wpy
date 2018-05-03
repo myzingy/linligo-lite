@@ -1,0 +1,118 @@
+<style lang="less">
+    @import "../../style/base.less";
+    .userinfo {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .userinfo-avatar {
+        width: 80rpx;
+        height: 80rpx;
+        border-radius: 50%;
+    }
+
+    .userinfo-nickname {
+        margin-left: @jianju15;
+    }
+    .tags{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        view{
+            border: 1px solid #ccc;
+            border-radius: 5rpx;
+            padding: 5rpx 15rpx;
+            margin-right: 10rpx;
+            &.title{
+                border-width: 0;
+            }
+        }
+    }
+</style>
+<template>
+    <view class="llgo">
+        <view class="foter">西安·龙记观澜山</view>
+        <view class="userinfo">
+            <image mode="aspectFill" class="userinfo-avatar"
+                   src="https://mp.weixin.qq.com/debug/wxadoc/dev/image/cat/7.png?t=2018424"></image>
+            <view class="userinfo-nickname">
+                <view>vking.wang</view>
+                <view>明早 7:00 前往 欣桥批发市场</view>
+                <view>大约 9:00 返回</view>
+            </view>
+        </view>
+        <view class="tags">
+            <view class="title">采购种类：</view>
+            <view>蔬菜</view>
+            <view>水果</view>
+            <view>肉蛋</view>
+            <view>水产</view>
+        </view>
+
+        <view class="flex-line">
+            <view>佣金：<text style="color:firebrick;">3元</text></view>
+            <view style="margin-left: 20rpx">状态：<text style="color:firebrick;">等待采购</text></view>
+        </view>
+
+        <button type="warn" open-type="getPhoneNumber" bindgetphonenumber="handlerGetPhone">帮我也带些</button>
+        <button type="primary" open-type="share">转发到业主群</button>
+    </view>
+</template>
+<script>
+    import wepy from 'wepy'
+    import URI from '../../util/uri'
+    export default class Info extends wepy.page {
+        config = {
+            navigationBarTitleText: '采购信息'
+        }
+        data = {
+            userInfo:{}
+        }
+        onLoad() {
+//            let self = this
+//            this.$parent.getUserInfo(function (userInfo) {
+//                if (userInfo) {
+//                    self.userInfo = userInfo
+//                }
+//                self.$apply()
+//            })
+            let params={
+                url:URI.setPhoneNumber, //自己服务器维护用户登录状态地址
+                data:{a:1,b:2},
+            }
+            wepy.request(params);
+        }
+        onShareAppMessage() {
+            return {
+                //title: '自定义转发标题',
+                //path: '/page/user?id=123',
+                success: function(res) {
+                    // 转发成功
+                },
+                fail: function(res) {
+                    // 转发失败
+                }
+            }
+        }
+        async tapJoin(){
+            await this.$parent.checkLoginState();
+            wepy.navigateTo({
+                url: '../address'
+            })
+        }
+        methods = {
+            handlerGetPhone(res){
+                console.log(res)
+                if(res.detail.errMsg="getPhoneNumber:ok"){
+                    let params={
+                        url:URI.setPhoneNumber, //自己服务器维护用户登录状态地址
+                        data:res,
+                    }
+                    wepy.request(params);
+                }
+            }
+        }
+    }
+
+</script>

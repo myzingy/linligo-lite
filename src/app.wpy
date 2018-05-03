@@ -1,0 +1,274 @@
+<style lang="less">
+    .container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        box-sizing: border-box;
+    }
+</style>
+
+<script>
+    import wepy from 'wepy'
+    import 'wepy-async-function'
+    import URI from './util/uri'
+
+    export default class extends wepy.app {
+        config = {
+            pages: [
+                'pages/purchase/info',
+                'pages/index',
+                'pages/address',
+
+            ],
+            window: {
+                backgroundTextStyle: 'light',
+                navigationBarBackgroundColor: '#fff',
+                navigationBarTitleText: 'WeChat',
+                navigationBarTextStyle: 'black'
+            }
+        }
+
+        globalData = {
+            userInfo: null,
+            isRefresh:false
+        }
+
+        constructor() {
+            super()
+            this.use('requestfix')
+            this.use('promisify');
+            // 拦截request请求
+            this.intercept('request', {
+                // 发出请求时的回调函数
+                config (p) {
+                    // 对所有request请求中的OBJECT参数对象统一附加时间戳属性
+                    p.timestamp = +new Date();
+                    if(typeof p.url.type!='undefined' && !p.method){
+                        p.method=p.url.type;
+                    }
+                    console.log('config request: ', p.url);
+                    p.url=URI.cgi(p.url);
+
+                    let  Bearer = wx.getStorageSync('access_token')
+                    p.header= {
+                        'Authorization': Bearer ? ('Bearer ' + Bearer) : '',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                    console.log('config request: ', arguments);
+                    // 必须返回OBJECT参数对象，否则无法发送请求到服务端
+                    return p;
+                },
+
+                // 请求成功后的回调函数
+                success (p) {
+                    // 可以在这里对收到的响应数据对象进行加工处理
+                    console.log('request success: ', p);
+                    // 必须返回响应数据对象，否则后续无法对响应数据进行处理
+                    return p.data;
+                },
+
+                //请求失败后的回调函数
+                fail (p) {
+                    console.log('request fail: ', p);
+                    // 必须返回响应数据对象，否则后续无法对响应数据进行处理
+                    return p;
+                },
+
+                // 请求完成时的回调函数(请求成功或失败都会被执行)
+                complete (p) {
+                    console.log('request complete: ', p);
+                }
+            });
+        }
+
+        onLaunch() {
+            //this.testAsync();
+            this.checkLoginState();
+        }
+
+        sleep(s) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    resolve('promise resolved')
+                }, s * 1000)
+            })
+        }
+
+        async testAsync() {
+            const data = await this.sleep(3)
+            console.log(data)
+        }
+
+        getUserInfo(cb) {
+            const that = this
+            if (this.globalData.userInfo) {
+                return this.globalData.userInfo
+            }
+            wepy.getUserInfo({
+                success (res) {
+                    that.globalData.userInfo = res.userInfo
+                    cb && cb(res.userInfo)
+                }
+            })
+        }
+        onShow(){
+            let refreshToken = wepy.getStorageSync('refresh_token');
+            console.log('init->refreshToken',refreshToken)
+            if (refreshToken) this.globalData.isRefresh=true;
+        }
+        async commonRequest (url, data = '', method = 'POST') {
+
+            //结合onshow,如果isRefresh为true,重新请求后端接口获取数据
+            if(this.globalData.isRefresh){
+
+                if( ! await this.refreshTokenFunc()){
+                    return false;
+                }
+                this.globalData.isRefresh=false;
+            }
+
+            let  value = wx.getStorageSync('access_token')
+
+            let params = {
+                url: url,
+
+                data: data,
+
+                method: method,
+
+                header: {
+                    'Authorization': value ? ('Bearer ' + value) : '',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            }
+
+            return await wepy.request(params);
+        }
+        async refreshTokenFunc(){
+
+            let refreshToken = wx.getStorageSync('refresh_token')
+            let params={
+                url:URI.refreshToken,
+                data:{
+                    refresh_token: refreshToken
+                },
+                method:"POST"
+            }
+
+            return  await wepy.request(params).then(res => {
+                console.log('刷新token 中');
+                try {
+                    wepy.setStorageSync('access_token', res.access_token)
+                    wepy.setStorageSync('refresh_token', res.refresh_token);
+                    return true;
+
+                } catch (e) {
+                    return false;
+                }
+
+            }).catch(res => {
+
+                return false;
+            });
+        }
+        async login () {
+            try {
+                let {code: code} = await wepy.login();
+
+                let {iv: iv, encryptedData: encryptedData, userInfo: userInfo} = await  wepy.getUserInfo({withCredentials: true})
+
+                let loginData = {code: code, iv: iv, encryptedData: encryptedData}
+
+
+                let params={
+
+                    url:URI.miniLogin, //自己服务器维护用户登录状态地址
+                    data:loginData,
+                    method:"POST",
+                    header: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                }
+
+                return await wepy.request(params).then(res => {
+
+                    this.globalData.userInfo = userInfo
+                    console.log('login-res',res);
+                    try {
+                        wepy.setStorageSync('access_token', res.access_token)
+                        wepy.setStorageSync('refresh_token', res.refresh_token)
+                        return true;
+                    } catch (e) {
+                        return false;
+                    }
+                }).catch(res => {
+                    console.log('login error');
+                    return false;
+                })
+
+            } catch (err) {
+                console.log('login-catch',err);
+                return await this.checkSettingStatus();
+            }
+
+        }
+        async checkLoginState () {
+            try {
+                //微信自己的code 状态
+                let wxLoginState = await wepy.checkSession().then(res => {return true}, res => {return false});
+                console.log('wxLoginState',wxLoginState);
+                //自己服务器的状态
+                let token = wepy.getStorageSync('access_token')
+
+                if (!wxLoginState || !token) {
+                    console.log('checkLoginState->login');
+                    return await  this.login();
+                } else {
+
+                    return true;
+                }
+            } catch (res) {
+                console.log('检查登录状态---checkLoginState',res);
+            }
+
+        }
+        async checkSettingStatus () {
+            // 判断是否是第一次授权，非第一次授权且授权失败则进行提醒
+            try {
+                let auth = await wepy.getSetting();
+
+                let authSetting = auth.authSetting;
+
+                if (authSetting['scope.userInfo'] === false) {
+
+                    let confirm = await wepy.showModal({
+                        title: '用户未授权',
+                        content: '如需正常使用功能，请按确定并在授权管理中选中“用户信息”，然后点按确定。最后再重新进入小程序即可正常使用。',
+                        showCancel: false,
+                    });
+
+                    if (confirm.confirm) {
+
+                        await wepy.openSetting();
+                        return await this.login();
+
+                    } else {
+                        return false;
+                    }
+
+                } else {
+                    return true;
+                }
+
+            } catch (res) {
+
+            }
+
+        }
+    }
+</script>
