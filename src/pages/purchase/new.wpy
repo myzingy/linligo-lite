@@ -191,6 +191,7 @@
     import wepy from 'wepy'
     import URI from '../../util/uri'
     import daa from '../data';
+    import WxValidate from  '../../util/WxValidate';
     export default class Info extends wepy.page {
         config = {
             navigationBarTitleText: '采购信息'
@@ -208,7 +209,6 @@
             types:daa.types,
             showTopTips:false,
             showTopTipsMsg:"出错了",
-
         }
 
         getDate(next = 0) {
@@ -228,6 +228,7 @@
 
         onLoad() {
             this.getLocation();
+            this.validateInit();
             let that=this;
             wepy.getStorage({
                 key: 'purchase-form'
@@ -239,7 +240,48 @@
                 that.setDateRange();
             });
         }
+        validateInit(){
+            // 验证字段的规则
+            const rules = {
+                slogan: {
+                    required: true
+                },
+                region: {
+                    required: true
+                },
+                goto: {
+                    required: true
+                },
+                distribution:{
+                    required: true
+                },
+                types:{
+                    required: true
+                },
+            }
 
+// 验证字段的提示信息，若不传则调用默认的信息
+            const messages = {
+                slogan: {
+                    required: '请填写标语'
+                },
+                region: {
+                    required: '请填写小区'
+                },
+                goto: {
+                    required: '请填写去往地址'
+                },
+                distribution:{
+                    required: '请选择配送方式'
+                },
+                types:{
+                    required: '请选择购买种类'
+                },
+            }
+
+// 创建实例对象
+            this.WxValidate = new WxValidate(rules, messages)
+        }
         getLocation() {
             let that = this
             wx.getLocation({
@@ -343,6 +385,7 @@
                 })
             },
             distributionChange(e){
+                this.form.distribution=e.detail.value;
                 console.log('distributionChange：', e.detail.value)
                 var checkboxItems = this.distribution, values = e.detail.value;
                 for (var i = 0, lenI = checkboxItems.length; i < lenI; ++i) {
@@ -360,6 +403,7 @@
                 this.$apply();
             },
             typesChange(e){
+                this.form.types=e.detail.value;
                 console.log('typesChange：', e.detail.value)
                 var checkboxItems = this.types, values = e.detail.value;
                 for (var i = 0, lenI = checkboxItems.length; i < lenI; ++i) {
@@ -379,7 +423,19 @@
             formSubmit(e){
                 console.log('formSubmit：', e.detail.value)
                 wepy.setStorageSync('purchase-form', e.detail.value);
-                this.showTopTipsFun();
+
+                if (!this.WxValidate.checkForm(e)) {
+                    const error = this.WxValidate.errorList[0];
+                    console.log('WxValidate-error', error)
+                    this.showTopTipsFun(error.msg);
+                    return false
+                }
+                this.form.location=this.location;
+                let params={
+                    url:URI.purchaseCreate,
+                    data:this.form,
+                }
+                wepy.request(params);
             },
             apply(e){
                 console.log('apply', e);
