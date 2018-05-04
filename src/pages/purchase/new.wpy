@@ -1,5 +1,5 @@
 <style lang="less">
-    @import "../../style/base.less";
+    /*
     .userinfo {
         display: flex;
         flex-direction: row;
@@ -57,102 +57,200 @@
                 margin: 20rpx 50rpx;
             }
         }
-    }
+    }*/
 </style>
 <template>
-    <view class="llgo">
-        <form bindsubmit="formSubmit" class="activity">
-            <view class="section">
-                <input name="slogan" placeholder="标语，如周末吃些好的" />
-            </view>
-            <view class="section">
-                <input name="region" placeholder="请输入小区名称" />
-            </view>
-            <view class="section">
-                <input name="goto" placeholder="去往市场名称" />
-            </view>
-            <view class="section flex-line">
-                <view  style="width: 50%;">
-                    <picker name="stime" mode="stime" value="{{stime}}" start="00:00" end="23:59">
-                        <view class="picker">
-                            出发时间:{{stime}}<icon type="waiting" size="15" color="orange"/>
+    <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
+        <view class="page__bd">
+            <view class="weui-toptips weui-toptips_warn" wx:if="{{showTopTips}}">{{showTopTipsMsg}}</view>
+            <form bindsubmit="formSubmit" class="activity">
+                <view class="weui-cells weui-cells_after-title">
+                    <view class="weui-cell weui-cell_input">
+                        <view class="weui-cell__hd">
+                            <view class="weui-label">标语</view>
                         </view>
-                    </picker>
-                </view>
-                <view  style="width: 50%;">
-                    <picker name="etime" mode="etime" value="{{etime}}" start="00:00" end="23:59">
-                        <view class="picker">
-                            返回时间:{{etime}}<icon type="waiting" size="15" color="orange"/>
+                        <view class="weui-cell__bd">
+                            <input name="slogan" placeholder="如：周末吃些新鲜健康的" value="{{form.slogan}}"/>
                         </view>
-                    </picker>
-                </view>
-            </view>
-            <view class="section">
-                <view>配送方式</view>
-                <checkbox-group bindchange="distributionChange" name="distribution">
-                    <label class="checkbox" wx:for="{{['楼下自提','送货到家','来我家取']}}" wx:for-key="key">
-                        <checkbox value="{{item}}"/>{{item}}
-                    </label>
-                </checkbox-group>
-            </view>
-            <view class="section">
-                <view>购买类型</view>
-                <checkbox-group name="types">
-                    <label class="checkbox" wx:for="{{['蔬菜','水果','肉蛋','水产']}}" wx:for-key="key">
-                        <checkbox value="{{item}}"/>{{item}}
-                    </label>
-                </checkbox-group>
-            </view>
-            <view class="section">
-                <view >佣金</view>
-                <view class="flex-line">
-                    <view style="width: 90%">
-                        <slider name="commission"  min="1" max="10" show-value/>
                     </view>
-                    <view style="margin-top: 15rpx">元</view>
-                </view>
-            </view>
-            <view class="btn-area">
-                <button formType="submit">创建</button>
-            </view>
-        </form>
+                    <view class="weui-cell weui-cell_input">
+                        <view class="weui-cell__hd">
+                            <view class="weui-label">小区</view>
+                        </view>
+                        <view class="weui-cell__bd">
+                            <input name="region" placeholder="请输入小区名称" value="{{form.region}}"/>
+                        </view>
+                    </view>
+                    <view class="weui-cell weui-cell_input">
+                        <view class="weui-cell__hd">
+                            <view class="weui-label">去往</view>
+                        </view>
+                        <view class="weui-cell__bd">
+                            <input name="goto" placeholder="批发市场/超市/商城 名称" value="{{form.goto}}"/>
+                        </view>
+                    </view>
+                    <view class="weui-cell weui-cell_input">
+                        <view class="weui-cell__hd">
+                            <view class="weui-label">采购日期</view>
+                        </view>
+                        <view class="weui-cell__bd">
+                            <picker name="dateIndex" mode="selector" value="{{form.dateIndex}}" range="{{dateRange}}"
+                                    data-formkey="dateIndex" bindchange="apply">
+                                <view class="picker">
+                                    {{form.dateStr}}
+                                </view>
+                            </picker>
+                        </view>
+                    </view>
+                    <view class="weui-cell" style="padding-top: 0; padding-bottom: 0;">
+                        <view class="weui-cell weui-cell_input" style="width: 48%; padding-left: 0;padding-right: 0">
+                            <view class="weui-cell__hd">
+                                <view class="weui-label"><icon type="waiting" size="15" color="orange"/>出发</view>
+                            </view>
+                            <view class="weui-cell__bd">
+                                <picker name="stime" mode="time" value="{{form.stime}}" start="00:00" end="23:59"
+                                        data-formkey="stime" bindchange="apply">
+                                    <view class="picker">
+                                        {{form.stime}}
+                                    </view>
+                                </picker>
+                            </view>
+                        </view>
+                        <view class="weui-cell weui-cell_input" style="width: 48%;padding-left: 0;padding-right: 0">
+                            <view class="weui-cell__hd">
+                                <view class="weui-label"><icon type="waiting" size="15" color="orange"/>返回</view>
+                            </view>
+                            <view class="weui-cell__bd">
+                                <picker name="etime" mode="time" value="{{form.etime}}" start="00:00" end="23:59"
+                                        data-formkey="etime" bindchange="apply">
+                                    <view class="picker">
+                                        {{form.etime}}
+                                    </view>
+                                </picker>
+                            </view>
+                        </view>
+                    </view>
 
+
+                    <view class="weui-cell weui-cell_input" style="align-items:flex-start">
+                        <view style="width:45%">
+                            <view class="weui-cells__title">配送方式</view>
+                            <view class="weui-cells weui-cells_after-title">
+                                <checkbox-group bindchange="distributionChange" name="distribution">
+                                    <label class="weui-cell weui-check__label" wx:for="{{distribution}}" wx:key="value">
+                                        <checkbox class="weui-check" value="{{item.name}}" checked="{{item.checked}}"/>
+
+                                        <view class="weui-cell__hd weui-check__hd_in-checkbox">
+                                            <icon class="weui-icon-checkbox_circle" type="circle" size="23" wx:if="{{!item.checked}}"></icon>
+                                            <icon class="weui-icon-checkbox_success" type="success" size="23" wx:if="{{item.checked}}"></icon>
+                                        </view>
+                                        <view class="weui-cell__bd">{{item.name}}</view>
+                                    </label>
+                                </checkbox-group>
+                                <view class="weui-cell">
+                                    <view class="weui-cells__tips">"来我家取" 需要填写地址</view>
+                                </view>
+                            </view>
+                        </view>
+                        <view style="width:45%" style="border-left: 1px solid #ccc; padding-left: 5%; margin-left: 4%;">
+                            <view class="weui-cells__title">购买种类</view>
+                            <view class="weui-cells weui-cells_after-title">
+                                <checkbox-group bindchange="typesChange" name="types">
+                                    <label class="weui-cell weui-check__label" wx:for="{{types}}" wx:key="value">
+                                        <checkbox class="weui-check" value="{{item.name}}" checked="{{item.checked}}"/>
+
+                                        <view class="weui-cell__hd weui-check__hd_in-checkbox">
+                                            <icon class="weui-icon-checkbox_circle" type="circle" size="23" wx:if="{{!item.checked}}"></icon>
+                                            <icon class="weui-icon-checkbox_success" type="success" size="23" wx:if="{{item.checked}}"></icon>
+                                        </view>
+                                        <view class="weui-cell__bd">{{item.name}}</view>
+                                    </label>
+                                </checkbox-group>
+                            </view>
+                        </view>
+                    </view>
+
+                    <view class="weui-cell weui-cell_input">
+                        <view class="weui-cell__hd">
+                            <view class="weui-label">佣金</view>
+                        </view>
+                        <view class="weui-cell__bd">
+                            <slider name="commission" min="1" max="10" show-value value="{{form.commission}}"/>
+                        </view>
+                        <text>元</text>
+                    </view>
+                </view>
+                <view class="weui-btn-area">
+                    <button class="weui-btn" type="primary" formType="submit">确定</button>
+                </view>
+            </form>
+        </view>
     </view>
 </template>
 <script>
     import wepy from 'wepy'
     import URI from '../../util/uri'
+    import daa from '../data';
     export default class Info extends wepy.page {
         config = {
             navigationBarTitleText: '采购信息'
         }
         data = {
-            location:{},
-            stime:'06:00',
-            etime:'08:00',
-        }
-        onLoad() {
-//            let self = this
-//            this.$parent.getUserInfo(function (userInfo) {
-//                if (userInfo) {
-//                    self.userInfo = userInfo
-//                }
-//                self.$apply()
-//            })
-            this.getLocation();
+            location: {},
+            dateRange: [],
+            form: {
+                stime: '06:00',
+                etime: '08:00',
+                dateIndex: 0,
+                dateStr: '',
+            },
+            distribution:daa.distribution,
+            types:daa.types,
+            showTopTips:false,
+            showTopTipsMsg:"出错了",
 
         }
-        getLocation(){
+
+        getDate(next = 0) {
+            let d = new Date();
+            if (next > 0) {
+                d = new Date(d.setDate(d.getDate() + next))
+            }
+            return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+        }
+
+        setDateRange() {
+            this.dateRange = [this.getDate()+' (今天)', this.getDate(1)+' (明天)'];
+            this.form.dateStr = this.dateRange[this.form.dateIndex];
+            console.log(this.dateRange, this.form.dateStr);
+            this.$apply();
+        }
+
+        onLoad() {
+            this.getLocation();
+            let that=this;
+            wepy.getStorage({
+                key: 'purchase-form'
+            }).then(function(purchaseForm){
+                console.log('purchaseForm',purchaseForm);
+                that.form=purchaseForm.data;
+                that.setDateRange();
+            }).catch(function(){
+                that.setDateRange();
+            });
+        }
+
+        getLocation() {
             let that = this
             wx.getLocation({
                 type: 'wgs84',
-                success: function(res) {
-                    console.log('getLocation',res);
-                    that.location=res;
+                success: function (res) {
+                    console.log('getLocation', res);
+                    that.location = res;
                     that.$apply();
                 },
-                fail:function (res) {
-                    console.log('getLocation-catch',res);
+                fail: function (res) {
+                    console.log('getLocation-catch', res);
                     that.$parent.authSetting().then(function () {
                         that.getLocation();
                     });
@@ -160,47 +258,51 @@
             })
 
         }
+
         onShareAppMessage() {
             return {
                 //title: '自定义转发标题',
                 //path: '/page/user?id=123',
-                success: function(res) {
+                success: function (res) {
                     // 转发成功
                 },
-                fail: function(res) {
+                fail: function (res) {
                     // 转发失败
                 }
             }
         }
-        async tapJoin(){
+
+        async tapJoin() {
             //await this.$parent.checkLoginState();
             wepy.navigateTo({
                 url: '../address'
             })
         }
-        async setPhoneNumber(res){
+
+        async setPhoneNumber(res) {
             console.log(res);
-            if(res.detail.errMsg="getPhoneNumber:ok"){
-                let params={
-                    url:URI.setPhoneNumber, //自己服务器维护用户登录状态地址
-                    data:res.detail,
+            if (res.detail.errMsg = "getPhoneNumber:ok") {
+                let params = {
+                    url: URI.setPhoneNumber, //自己服务器维护用户登录状态地址
+                    data: res.detail,
                 }
                 wepy.request(params);
             }
         }
-        async chooseAddress(){
-            let that=this;
-            wepy.chooseAddress().then(function(res){
-                console.log('chooseAddress',res);
-            }).catch(function(){
+
+        async chooseAddress() {
+            let that = this;
+            wepy.chooseAddress().then(function (res) {
+                console.log('chooseAddress', res);
+            }).catch(function () {
                 wepy.showModal({
                     title: '授权提示',
                     content: '为方便使用，请授权小程序访问用户信息、地址信息以及电话',
                 }).then(function () {
                     wepy.openSetting().then(function (res) {
-                        console.log('wepy.openSetting',res);
+                        console.log('wepy.openSetting', res);
                         res.authSetting.forEach(scope => {
-                            if(scope==false){
+                            if (scope == false) {
                                 wepy.showToast({
                                     title: '未授权，无法使用',
                                     icon: 'none',
@@ -218,6 +320,18 @@
                 });
             })
         }
+
+        showTopTipsFun(msg='出错了'){
+            var that = this;
+            this.showTopTipsMsg= msg;
+            this.showTopTips= true
+            this.$apply();
+            setTimeout(function(){
+                this.showTopTipsMsg= '出错了';
+                that.showTopTips= false;
+                that.$apply();
+            }, 3000);
+        }
         methods = {
             handlerGetPhone(res){
                 this.setPhoneNumber();
@@ -230,10 +344,50 @@
             },
             distributionChange(e){
                 console.log('distributionChange：', e.detail.value)
+                var checkboxItems = this.distribution, values = e.detail.value;
+                for (var i = 0, lenI = checkboxItems.length; i < lenI; ++i) {
+                    checkboxItems[i].checked = false;
+
+                    for (var j = 0, lenJ = values.length; j < lenJ; ++j) {
+                        if(checkboxItems[i].name == values[j]){
+                            checkboxItems[i].checked = true;
+                            break;
+                        }
+                    }
+                }
+                console.log('distributionChange：',checkboxItems)
+                this.distribution=checkboxItems;
+                this.$apply();
+            },
+            typesChange(e){
+                console.log('typesChange：', e.detail.value)
+                var checkboxItems = this.types, values = e.detail.value;
+                for (var i = 0, lenI = checkboxItems.length; i < lenI; ++i) {
+                    checkboxItems[i].checked = false;
+
+                    for (var j = 0, lenJ = values.length; j < lenJ; ++j) {
+                        if(checkboxItems[i].name == values[j]){
+                            checkboxItems[i].checked = true;
+                            break;
+                        }
+                    }
+                }
+                console.log('distributionChange：',checkboxItems)
+                this.types=checkboxItems;
+                this.$apply();
             },
             formSubmit(e){
                 console.log('formSubmit：', e.detail.value)
-            }
+                wepy.setStorageSync('purchase-form', e.detail.value);
+                this.showTopTipsFun();
+            },
+            apply(e){
+                console.log('apply', e);
+                let formkey = e.target.dataset.formkey;
+                this.form[formkey] = e.detail.value;
+                this.form.dateStr = this.dateRange[this.form.dateIndex];
+                this.$apply();
+            },
         }
     }
 
