@@ -48,9 +48,9 @@
     export default class extends wepy.app {
         config = {
             pages: [
-                'pages/purchase/new',
-                'pages/purchase/info',
                 'pages/index',
+                'pages/purchase/info',
+                'pages/purchase/new',
                 'pages/address',
 
             ],
@@ -64,7 +64,8 @@
 
         globalData = {
             userInfo: null,
-            isRefresh:false
+            isRefresh:false,
+            option:null,
         }
 
         constructor() {
@@ -76,12 +77,20 @@
                 // 发出请求时的回调函数
                 config (p) {
                     // 对所有request请求中的OBJECT参数对象统一附加时间戳属性
+                    if(typeof p.url!='undefined'){
+                        if(!p.url.silence){
+                            wepy.showLoading({
+                                title: 'climax...',
+                                icon: 'loading'
+                            })
+                        }
+                    }
                     p.timestamp = +new Date();
                     if(typeof p.url.type!='undefined' && !p.method){
                         p.method=p.url.type;
                     }
                     //console.log('config request: ', p.url);
-                    p.url=URI.cgi(p.url);
+                    p.url=URI.cgi(p.url,p.data);
 
                     let  Bearer = wx.getStorageSync('access_token')
                     p.header= {
@@ -99,6 +108,11 @@
                     // 可以在这里对收到的响应数据对象进行加工处理
                     console.log('request success: ', p);
                     // 必须返回响应数据对象，否则后续无法对响应数据进行处理
+                    if(p.statusCode==401){
+                        this.checkLoginState();
+                        throw new Error('401');
+                        return false;
+                    }
                     return p.data;
                 },
 
@@ -112,6 +126,9 @@
                 // 请求完成时的回调函数(请求成功或失败都会被执行)
                 complete (p) {
                     console.log('request complete: ', p);
+                    setTimeout(function(){
+                        wepy.hideLoading();
+                    },500)
                 }
             });
         }
@@ -178,6 +195,22 @@
                     try {
                         wepy.setStorageSync('access_token', res.access_token)
                         wepy.setStorageSync('refresh_token', res.refresh_token)
+                        wepy.setStorageSync('userinfo', res.userinfo)
+                        console.log('.......',this);
+                        let that=this;
+                        wepy.getStorage({key:'params'}).then(function (_Storage) {
+                            let url='/'+that.__route__;
+                            let _params=_Storage.data
+                            if(_params){
+                                url+='?';
+                                for(let k in _params){
+                                    url+=k+'='+_params[k]+'&';
+                                }
+                            }
+                            console.log('.......',url,_params);
+                            wepy.reLaunch({url:url});
+                        });
+
                         return true;
                     } catch (e) {
                         return false;
@@ -273,6 +306,9 @@
                 });
             });
 
+        }
+        initPage(){
+            console.log('app-initPage');
         }
     }
 </script>

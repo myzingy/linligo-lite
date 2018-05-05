@@ -32,28 +32,27 @@
 </style>
 <template>
     <view class="llgo">
-        <view class="foter">西安·龙记观澜山</view>
+        <view class="foter">{{purchase.city}}·{{purchase.region}}</view>
         <view class="userinfo">
             <image mode="aspectFill" class="userinfo-avatar"
-                   src="https://mp.weixin.qq.com/debug/wxadoc/dev/image/cat/7.png?t=2018424"></image>
+                   src="{{purchase.wxuser.userinfo.avatarUrl}}"></image>
             <view class="userinfo-nickname">
-                <view>vking.wang</view>
-                <view>明早 7:00 前往 欣桥批发市场</view>
-                <view>大约 9:00 返回</view>
+                <view>{{purchase.wxuser.userinfo.nickName}}</view>
+                <view>{{stime}} 前往 {{purchase.goto}}</view>
+                <view>大约 {{etime}} 返回</view>
             </view>
         </view>
         <view class="tags">
             <view class="title">采购种类：</view>
-            <view>蔬菜</view>
-            <view>水果</view>
-            <view>肉蛋</view>
-            <view>水产</view>
+            <view wx:for="{{purchase.types}}" wx:key="value">{{item}}</view>
         </view>
-
+        <view class="tags">
+            <view class="title">配送方式：</view>
+            <view wx:for="{{purchase.distribution}}" wx:key="value">{{item}}</view>
+        </view>
         <view class="flex-line">
-            <view>佣金：<text style="color:firebrick;">3元</text></view>
-            <view style="margin-left: 20rpx">状态：<text style="color:firebrick;">等待采购</text></view>
-            <view style="margin-left: 20rpx">配送：<text style="color:firebrick;">楼下自提/送到家</text></view>
+            <view>佣金：<text style="color:firebrick;">{{purchase.commission}}元</text></view>
+            <view style="margin-left: 20rpx">状态：<text style="color:firebrick;">{{status}}</text></view>
         </view>
 
         <button type="warn" open-type="getPhoneNumber" bindgetphonenumber="handlerGetPhone">帮我也带些</button>
@@ -67,21 +66,30 @@
 <script>
     import wepy from 'wepy'
     import URI from '../../util/uri'
+    import dda from '../data'
     export default class Info extends wepy.page {
         config = {
             navigationBarTitleText: '采购信息'
         }
         data = {
-            userInfo:{}
+            userInfo:{},
+            purchase:{},
+            stime:"",
+            etime:"",
+            status:"",
+            id:23,
         }
-        onLoad() {
-//            let self = this
-//            this.$parent.getUserInfo(function (userInfo) {
-//                if (userInfo) {
-//                    self.userInfo = userInfo
-//                }
-//                self.$apply()
-//            })
+        onLoad(option) {
+            console.log('info-onLoad',option,this);
+            if(typeof option.id!='undefined'){
+                this.id=option.id;
+            }
+            this.getActivity(this.id);
+            wepy.setStorageSync('params',option);
+        }
+        onShow() {
+            console.log('info-onShow',arguments);
+            //this.getActivity(typeof option.id=='undefined'?23:option.id);
         }
         onShareAppMessage() {
             return {
@@ -95,6 +103,45 @@
                 }
             }
         }
+        initPage(){
+            this.getActivity(this.id);
+        }
+        async getActivity(id){
+            let that=this;
+            let params={
+                url:URI.purchase,
+                data:{id:id},
+            }
+            wepy.request(params).then(function (res) {
+                console.log('purchase：', res)
+                that.purchase=res;
+                that.setTimeStr();
+                that.status=dda.activityStatus[res.status];
+                that.$apply();
+            });
+        }
+        setTimeStr(){
+            let getDate=function(next = 0) {
+                let d = new Date();
+                if (next > 0) {
+                    d = new Date(d.setDate(d.getDate() + next))
+                }
+                let mm=(d.getMonth() + 1);
+                let dd=d.getDate();
+                return d.getFullYear() + '-' + (mm>10?mm:('0'+mm)) + '-' + (dd>10?dd:('0'+dd));
+            }
+            let day_0=getDate();
+            let day_1=getDate(1);
+            if(this.purchase.stime.indexOf(day_0)>-1){
+                this.stime='今天 '+ this.purchase.stime.substr(11,5);
+            }else if(this.purchase.stime.indexOf(day_1)>-1){
+                this.stime='明天 '+ this.purchase.stime.substr(11,5);
+            }else{
+                this.stime=this.purchase.stime.substr(0,16);
+            }
+            this.etime=this.purchase.etime.substr(11,5);
+        }
+
         async tapJoin(){
             //await this.$parent.checkLoginState();
             wepy.navigateTo({

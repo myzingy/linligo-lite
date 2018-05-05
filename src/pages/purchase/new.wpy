@@ -148,7 +148,7 @@
                                     </label>
                                 </checkbox-group>
                                 <view class="weui-cell">
-                                    <view class="weui-cells__tips">"来我家取" 需要填写地址</view>
+                                    <text style="font-size: 24rpx; color: #999;">"来我家取" 需要填写地址</text>
                                 </view>
                             </view>
                         </view>
@@ -209,6 +209,7 @@
             types:daa.types,
             showTopTips:false,
             showTopTipsMsg:"出错了",
+            address:null,
         }
 
         getDate(next = 0) {
@@ -333,32 +334,15 @@
         }
 
         async chooseAddress() {
+            if(this.address!=null) return;
             let that = this;
             wepy.chooseAddress().then(function (res) {
                 console.log('chooseAddress', res);
+                that.address=res;
+
             }).catch(function () {
-                wepy.showModal({
-                    title: '授权提示',
-                    content: '为方便使用，请授权小程序访问用户信息、地址信息以及电话',
-                }).then(function () {
-                    wepy.openSetting().then(function (res) {
-                        console.log('wepy.openSetting', res);
-                        res.authSetting.forEach(scope => {
-                            if (scope == false) {
-                                wepy.showToast({
-                                    title: '未授权，无法使用',
-                                    icon: 'none',
-                                    duration: 5000
-                                })
-                            }
-                        })
-                    });
-                }).catch(function () {
-                    wepy.showToast({
-                        title: '未授权，无法继续',
-                        icon: 'none',
-                        duration: 5000
-                    })
+                that.$parent.authSetting().then(function () {
+                    that.chooseAddress();
                 });
             })
         }
@@ -388,17 +372,26 @@
                 this.form.distribution=e.detail.value;
                 console.log('distributionChange：', e.detail.value)
                 var checkboxItems = this.distribution, values = e.detail.value;
+                let chooseAddressFlag=false;
                 for (var i = 0, lenI = checkboxItems.length; i < lenI; ++i) {
                     checkboxItems[i].checked = false;
 
                     for (var j = 0, lenJ = values.length; j < lenJ; ++j) {
                         if(checkboxItems[i].name == values[j]){
                             checkboxItems[i].checked = true;
+                            if(checkboxItems[i].name=='来我家取'){
+                                chooseAddressFlag=true;
+                            }
                             break;
                         }
                     }
                 }
                 console.log('distributionChange：',checkboxItems)
+                if(chooseAddressFlag){
+                    this.chooseAddress();
+                }else{
+                    this.address=null;
+                }
                 this.distribution=checkboxItems;
                 this.$apply();
             },
@@ -431,11 +424,17 @@
                     return false
                 }
                 this.form.location=this.location;
+                this.form.address=this.address;
                 let params={
                     url:URI.purchaseCreate,
                     data:this.form,
                 }
-                wepy.request(params);
+                wepy.request(params).then(function (res) {
+                    console.log('purchaseCreate：', res)
+                    wepy.redirectTo({
+                        url: './info?id='+res.id
+                    })
+                });
             },
             apply(e){
                 console.log('apply', e);

@@ -21,7 +21,7 @@
       <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
       <view class="userinfo-nickname">{{ userInfo.nickName }}</view>
     </view>
-    <navigator url="./purchase/info" hover-class="navigator-hover">跳转到新页面</navigator>
+    <navigator url="./purchase/info?id=22" hover-class="navigator-hover">跳转到新页面</navigator>
     <panel>
       <view class="title" slot="title">测试数据绑定</view>
 
