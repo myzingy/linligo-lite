@@ -1,34 +1,5 @@
 <style lang="less">
-    @import "../style/base.less";
-    .userinfo {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-    }
 
-    .userinfo-avatar {
-        width: 80rpx;
-        height: 80rpx;
-        border-radius: 50%;
-    }
-
-    .userinfo-nickname {
-        margin-left: @jianju15;
-    }
-    .tags{
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        view{
-            border: 1px solid #ccc;
-            border-radius: 5rpx;
-            padding: 5rpx 15rpx;
-            margin-right: 10rpx;
-            &.title{
-                border-width: 0;
-            }
-        }
-    }
 </style>
 <template>
     <view class="llgo">

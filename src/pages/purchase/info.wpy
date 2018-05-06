@@ -1,66 +1,108 @@
 <style lang="less">
-    @import "../../style/base.less";
-    .userinfo {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
+    .weui-form-preview:before{
+        border-top-width:0 ;
     }
-
-    .userinfo-avatar {
-        width: 80rpx;
-        height: 80rpx;
-        border-radius: 50%;
-    }
-
-    .userinfo-nickname {
-        margin-left: @jianju15;
-    }
-    .tags{
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        view{
-            border: 1px solid #ccc;
-            border-radius: 5rpx;
-            padding: 5rpx 15rpx;
-            margin-right: 10rpx;
-            &.title{
-                border-width: 0;
-            }
-        }
+    .placeholder{
+        margin: 5px;
+        padding: 0 10px;
+        text-align: center;
+        background-color: #EBEBEB;
+        height: 2.3em;
+        line-height: 2.3em;
+        color: #cfcfcf;
     }
 </style>
 <template>
-    <view class="llgo">
-        <view class="foter">{{purchase.city}}·{{purchase.region}}</view>
-        <view class="userinfo">
-            <image mode="aspectFill" class="userinfo-avatar"
-                   src="{{purchase.wxuser.userinfo.avatarUrl}}"></image>
-            <view class="userinfo-nickname">
-                <view>{{purchase.wxuser.userinfo.nickName}}</view>
-                <view>{{stime}} 前往 {{purchase.goto}}</view>
-                <view>大约 {{etime}} 返回</view>
+    <view class="page">
+        <view class="page__bd">
+            <view class="weui-panel weui-panel_access">
+                <view class="weui-cells weui-cells_after-title">
+                    <view class="weui-cell weui-cell_access">
+                        <view class="weui-cell__bd color-red">{{stime}} 前往 {{purchase.goto}}，大约 {{etime}} 返回</view>
+                        <view class="weui-cell__ft weui-cell__ft_in-access" style="font-size: 0">
+                            <view class="color-green" style="display: inline-block;vertical-align:middle; font-size: 28rpx;">个人<view>中心</view></view>
+                        </view>
+                    </view>
+                </view>
+                <view class="weui-panel__bd">
+                    <navigator url="" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
+                        <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
+                            <image class="weui-media-box__thumb" src="{{purchase.wxuser.userinfo.avatarUrl}}" />
+                        </view>
+                        <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
+                            <view class="weui-media-box__title">{{purchase.slogan}}</view>
+                            <view class="weui-media-box__desc">
+                                <text class="color-blue">发起人：</text>{{purchase.wxuser.userinfo.nickName}}
+                                <view>{{purchase.city}}·{{purchase.region}}</view>
+                            </view>
+                        </view>
+                    </navigator>
+                </view>
+            </view>
+            <view class="weui-form-preview">
+                <view class="weui-form-preview__bd">
+                    <view class="weui-form-preview__item">
+                        <view class="weui-form-preview__label">状态</view>
+                        <view class="weui-form-preview__value">{{status}}</view>
+                    </view>
+                    <view class="weui-form-preview__item">
+                        <view class="weui-form-preview__label">采购种类</view>
+                        <view class="weui-form-preview__value">
+                            <view class="weui-badge" style="margin-left: 5px;"
+                                  wx:for="{{purchase.types}}" wx:key="value">{{item}}</view>
+                        </view>
+                    </view>
+                    <view class="weui-form-preview__item">
+                        <view class="weui-form-preview__label">配送方式</view>
+                        <view class="weui-form-preview__value">
+                            <view class="weui-badge bg-color-blue" style="margin-left: 5px;"
+                                    wx:for="{{purchase.distribution}}" wx:key="value">{{item}}</view>
+                        </view>
+                    </view>
+                    <view class="weui-form-preview__item">
+                        <view class="weui-form-preview__label">佣金</view>
+                        <view class="weui-form-preview__value">
+                            {{purchase.commission}}元
+                        </view>
+                    </view>
+                </view>
+                <view class="page__bd_spacing">
+                    <view class="weui-flex">
+                        <view>
+                            <button type="warn" open-type="getPhoneNumber"
+                                    bindgetphonenumber="handlerNewActivity"
+                                    class="bg-color-blue"
+                                    wx:if="{{!hasPhone}}" style="font-size: 28rpx; line-height: 28rpx; padding: 16rpx;">
+                                <view>发起</view>
+                                <view>采购</view>
+                            </button>
+                            <button type="warn" @tap="navigateToNew" wx:else="" class="bg-color-blue"
+                                    style="font-size: 28rpx; line-height: 28rpx; padding: 16rpx;">
+                                <view>发起</view>
+                                <view>采购</view>
+                            </button>
+                        </view>
+                        <view class="weui-flex__item" style="margin: 0 20rpx">
+                            <button type="warn" open-type="getPhoneNumber" bindgetphonenumber="handlerNewOrder" wx:if="{{!hasPhone}}">帮我也带些</button>
+                            <button type="warn" @tap="navigateToOrder" wx:else="">帮我也带些</button>
+                        </view>
+                        <view>
+                            <button type="primary" open-type="share"
+                                    style="font-size: 20rpx; line-height: 24rpx; padding: 16rpx;">
+                                <view style="font-size: 14px; margin-bottom: 4px;">转发</view>
+                                <view>赢红包</view>
+                            </button>
+                        </view>
+                    </view>
+                </view>
+                <view class="weui-form-preview__bd" style="padding: 0 30rpx 20rpx;">
+                    <view class="weui-form-preview__item">
+                        <view class="weui-form-preview__label"></view>
+                        <view class="weui-form-preview__value" style="font-size: 20rpx;">红包可用于抵扣金额</view>
+                    </view>
+                </view>
             </view>
         </view>
-        <view class="tags">
-            <view class="title">采购种类：</view>
-            <view wx:for="{{purchase.types}}" wx:key="value">{{item}}</view>
-        </view>
-        <view class="tags">
-            <view class="title">配送方式：</view>
-            <view wx:for="{{purchase.distribution}}" wx:key="value">{{item}}</view>
-        </view>
-        <view class="flex-line">
-            <view>佣金：<text style="color:firebrick;">{{purchase.commission}}元</text></view>
-            <view style="margin-left: 20rpx">状态：<text style="color:firebrick;">{{status}}</text></view>
-        </view>
-
-        <button type="warn" open-type="getPhoneNumber" bindgetphonenumber="handlerGetPhone">帮我也带些</button>
-        <view class="flex-line">
-            <view><button type="warn" open-type="getPhoneNumber" bindgetphonenumber="handlerNewActivity">发起新采购</button></view>
-            <view><button type="primary" open-type="share">转发到业主群</button></view>
-        </view>
-
     </view>
 </template>
 <script>
@@ -78,8 +120,12 @@
             etime:"",
             status:"",
             id:23,
+            hasPhone:"",
+            hasShare:false,
         }
         onLoad(option) {
+            this.hasPhone=this.$parent.globalData.phone;
+            this.userInfo=this.$parent.globalData.userInfo;
             console.log('info-onLoad',option,this);
             if(typeof option.id!='undefined'){
                 this.id=option.id;
@@ -92,9 +138,21 @@
             //this.getActivity(typeof option.id=='undefined'?23:option.id);
         }
         onShareAppMessage() {
+            if(this.hasShare){
+                return {
+                    //title: '自定义转发标题',
+                    //path: '/page/user?id=123',
+                    success: function(res) {
+                        // 转发成功
+                    },
+                    fail: function(res) {
+                        // 转发失败
+                    }
+                }
+            }
             return {
-                //title: '自定义转发标题',
-                //path: '/page/user?id=123',
+                title: '邻里逛市场',
+                path: '/page/user?id=123',
                 success: function(res) {
                     // 转发成功
                 },
@@ -117,6 +175,8 @@
                 that.purchase=res;
                 that.setTimeStr();
                 that.status=dda.activityStatus[res.status];
+                //userInfo.openId == purchase.wxuser.openid
+                that.hasShare=that.userInfo.openId == res.wxuser.openid;
                 that.$apply();
             });
         }
@@ -150,53 +210,38 @@
         }
         async setPhoneNumber(res){
             console.log(res);
-            if(res.detail.errMsg="getPhoneNumber:ok"){
+            if(res.detail.iv){
                 let params={
                     url:URI.setPhoneNumber, //自己服务器维护用户登录状态地址
                     data:res.detail,
                 }
-                wepy.request(params);
+                wepy.request(params).then(function(res){
+                    console.log('setPhoneNumber',res);
+                    wepy.setStorage({key:'phone',data:res.phoneNumber});
+                });
             }
         }
-        async chooseAddress(){
-            let that=this;
-            wepy.chooseAddress().then(function(res){
-                console.log('chooseAddress',res);
-            }).catch(function(){
-                wepy.showModal({
-                    title: '授权提示',
-                    content: '为方便使用，请授权小程序访问用户信息、地址信息以及电话',
-                }).then(function () {
-                    wepy.openSetting().then(function (res) {
-                        console.log('wepy.openSetting',res);
-                        res.authSetting.forEach(scope => {
-                            if(scope==false){
-                                wepy.showToast({
-                                    title: '未授权，无法使用',
-                                    icon: 'none',
-                                    duration: 5000
-                                })
-                            }
-                        })
-                    });
-                }).catch(function () {
-                    wepy.showToast({
-                        title: '未授权，无法继续',
-                        icon: 'none',
-                        duration: 5000
-                    })
-                });
+        navigateToNew(){
+            wepy.navigateTo({
+                url: './new'
+            })
+        }
+        navigateToOrder(){
+            wepy.navigateTo({
+                url: './order?act_id='+this.id
             })
         }
         methods = {
             handlerGetPhone(res){
-                this.setPhoneNumber();
+                this.setPhoneNumber(res);
             },
-            handlerNewActivity(){
-                this.setPhoneNumber();
-                wepy.navigateTo({
-                    url: './new'
-                })
+            handlerNewActivity(res){
+                this.setPhoneNumber(res);
+                this.navigateToNew();
+            },
+            handlerNewOrder(res){
+                this.setPhoneNumber(res);
+                this.navigateToOrder();
             },
         }
     }

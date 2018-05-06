@@ -1,0 +1,38 @@
+<style lang="less">
+
+</style>
+<template>
+    <view class="llgo">
+        <button type="primary" @tap="chooseAddress">使用微信地址</button>
+    </view>
+</template>
+<script>
+    import wepy from 'wepy'
+    export default class Order extends wepy.page {
+        config = {
+            navigationBarTitleText: '采购信息'
+        }
+        data = {
+            userInfo:{}
+        }
+        onLoad() {
+//            let self = this
+//            this.$parent.getUserInfo(function (userInfo) {
+//                if (userInfo) {
+//                    self.userInfo = userInfo
+//                }
+//                self.$apply()
+//            })
+        }
+        methods = {
+
+            handlerGetUserInfo(res){
+                console.log(res)
+            },
+            handlerGetPhone(res){
+                console.log(res)
+            }
+        }
+    }
+
+</script>

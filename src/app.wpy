@@ -1,4 +1,5 @@
 <style lang="less">
+    @import "./style/base";
     @import "./style/weui";
     page{
         background-color: #F8F8F8;
@@ -48,10 +49,11 @@
     export default class extends wepy.app {
         config = {
             pages: [
-                'pages/index',
                 'pages/purchase/info',
                 'pages/purchase/new',
+                'pages/purchase/order',
                 'pages/address',
+                'pages/index',
 
             ],
             window: {
@@ -65,7 +67,7 @@
         globalData = {
             userInfo: null,
             isRefresh:false,
-            option:null,
+            phone:"",
         }
 
         constructor() {
@@ -136,6 +138,16 @@
         onLaunch() {
             //this.testAsync();
             this.checkLoginState();
+            //
+            let that=this;
+            wepy.getStorage({key:'userinfo'}).then(function (res) {
+                console.log('globalData.userInfo',res);
+                that.globalData.userInfo=res.data;
+            })
+            wepy.getStorage({key:'phone'}).then(function (res) {
+                console.log('globalData.phone',res);
+                that.globalData.phone=res.data;
+            })
         }
 
         sleep(s) {
