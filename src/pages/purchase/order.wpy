@@ -2,27 +2,66 @@
 
 </style>
 <template>
-    <view class="llgo">
-        <button type="primary" @tap="chooseAddress">使用微信地址</button>
+    <view class="page__bd">
+        <view class="weui-panel weui-panel_access">
+            <view class="weui-panel__hd">图文组合列表</view>
+            <view class="weui-panel__bd">
+                <navigator url="" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
+                    <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
+                        <image class="weui-media-box__thumb" src="{{icon60}}" />
+                    </view>
+                    <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
+                        <view class="weui-media-box__title">标题一</view>
+                        <view class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</view>
+                    </view>
+                </navigator>
+                <navigator url="" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
+                    <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
+                        <image class="weui-media-box__thumb" src="{{icon60}}" />
+                    </view>
+                    <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
+                        <view class="weui-media-box__title">标题二</view>
+                        <view class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</view>
+                    </view>
+                </navigator>
+            </view>
+            <view class="weui-panel__ft">
+                <view class="weui-cell weui-cell_access weui-cell_link">
+                    <view class="weui-cell__bd">查看更多</view>
+                    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                </view>
+            </view>
+        </view>
     </view>
 </template>
 <script>
     import wepy from 'wepy'
+    import URI from '../../util/uri'
+    import dda from '../data'
     export default class Order extends wepy.page {
         config = {
             navigationBarTitleText: '采购信息'
         }
         data = {
-            userInfo:{}
+            act_id:23
         }
-        onLoad() {
-//            let self = this
-//            this.$parent.getUserInfo(function (userInfo) {
-//                if (userInfo) {
-//                    self.userInfo = userInfo
-//                }
-//                self.$apply()
-//            })
+        onLoad(option) {
+            if(typeof option.act_id!='undefined'){
+                this.act_id=option.act_id;
+            }
+            this.getActivityOrder(this.act_id);
+        }
+        async getActivityOrder(act_id){
+            let that=this;
+            let params={
+                url:URI.purchaseOrder,
+                data:{act_id:act_id},
+            }
+            wepy.request(params).then(function (res) {
+                console.log('purchase：', res)
+                that.purchase=res;
+                that.$apply();
+            });
         }
         methods = {
 

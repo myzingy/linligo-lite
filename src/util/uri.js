@@ -23,4 +23,5 @@ export default {
 
     purchaseCreate:{act:'activity',code:'10004',type:'POST',timeout:0},
     purchase:{act:'activity/{id}',code:'10005',type:'GET',timeout:0},
+    purchaseOrder:{act:'order/{act_id}',code:'10006',type:'GET',timeout:0},
 }
