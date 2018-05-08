@@ -100,6 +100,7 @@
                         <view class="weui-form-preview__label"></view>
                         <view class="weui-form-preview__value" style="font-size: 20rpx;">红包可用于抵扣金额</view>
                     </view>
+                    <button type="primary" @tap="startPurchase">到市场了，开始采购</button>
                 </view>
             </view>
         </view>
@@ -130,12 +131,11 @@
             if(typeof option.id!='undefined'){
                 this.id=option.id;
             }
-            this.getActivity(this.id);
             wepy.setStorageSync('params',option);
         }
         onShow() {
             console.log('info-onShow',arguments);
-            //this.getActivity(typeof option.id=='undefined'?23:option.id);
+            this.getActivity(this.id);
         }
         onShareAppMessage() {
             if(this.hasShare){
