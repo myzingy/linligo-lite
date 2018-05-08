@@ -1,34 +1,115 @@
 <style lang="less">
-
+    .searchbar-result{
+        margin-top: 0;
+        font-size: 14px;
+        view{
+            padding: 10rpx 0 10rpx 10rpx;
+            border-bottom: 1px solid #ccc;
+        }
+        border: 1px solid #ccc;
+        position: absolute;
+        z-index:99;
+        width: 65%;
+        background: #fff;
+    }
+    .searchbar-result:before{
+        display: none;
+    }
+    .mini-btn{
+        margin-right: 5px;
+        line-height: inherit;
+    }
 </style>
 <template>
-    <view class="page__bd">
-        <view class="weui-panel weui-panel_access">
-            <view class="weui-panel__hd">图文组合列表</view>
-            <view class="weui-panel__bd">
-                <navigator url="" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
-                    <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
-                        <image class="weui-media-box__thumb" src="{{icon60}}" />
+    <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
+        <view class="page__bd">
+            <view class="weui-toptips weui-toptips_warn" wx:if="{{showTopTips}}">{{showTopTipsMsg}}</view>
+            <form bindsubmit="formSubmit" class="activity">
+                <input name="weight_unit" value="{{form.weight_unit}}" style="display: none;"/>
+                <input name="distribution" value="{{form.distribution}}" style="display: none;"/>
+                <view class="weui-cells weui-cells_after-title">
+                    <view class="weui-cell">
+                        <view style="display: flex;flex-direction: row;width: 40%;">
+                            <view style="width:60px; line-height: 30px;">配送:</view>
+                            <picker name="distributionIndex" mode="selector" value="{{form.distributionIndex}}" range="{{purchase.distribution}}"
+                                    data-formkey="distributionIndex" bindchange="apply">
+                                <view class="picker" style="line-height: 30px;">
+                                    {{form.distribution?form.distribution:'请选择'}}
+                                </view>
+                            </picker>
+                        </view>
+                        <view style="display: flex;flex-direction: row;width: 40%;">
+                            <view style="width:60px; line-height: 30px;">佣金:</view>
+                            <input name="commission" placeholder="输入佣金" style="width: 50px;border-bottom: 1px solid #ccc;"
+                                   value="{{form.commission}}" bindchange="apply" data-formkey="commission"/>
+                            <view style="line-height: 30px;">元</view>
+                        </view>
+                        <view style="width: 20%;">
+                            <button class="weui-btn mini-btn" type="primary" formType="submit" data-formkey="orderSetting">设置</button>
+                        </view>
                     </view>
-                    <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
-                        <view class="weui-media-box__title">标题一</view>
-                        <view class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</view>
+                </view>
+                <view class="weui-cells__title">采购信息</view>
+                <view class="weui-cells weui-cells_after-title">
+                    <view class="weui-cell weui-cell_input">
+                        <view class="weui-cell__hd">
+                            <view class="weui-label">商品名称</view>
+                        </view>
+                        <view class="weui-cell__bd">
+                            <input name="name" placeholder="请输入 果蔬/肉蛋/水产 名称"
+                                   value="{{form.name}}" bindinput="inputTyping" focus="{{true}}"/>
+                            <view class="weui-cells searchbar-result" wx:if="{{inputShowed}}">
+                                <view @tap="checkedInputVal" data-value="{{item.name}}"
+                                      wx:for="{{inputList}}" wx:key="key">{{item.name}}</view>
+                            </view>
+                        </view>
                     </view>
-                </navigator>
-                <navigator url="" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
-                    <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
-                        <image class="weui-media-box__thumb" src="{{icon60}}" />
+
+                    <view class="weui-cell weui-cell_input">
+                        <view class="weui-cell__bd">
+                            <slider name="weight" min="0.5" max="10" step="0.5"
+                                    bindchange="apply" data-formkey="weight"
+                                    show-value value="{{form.weight}}"/>
+                        </view>
+                        <view class="weui-cell__hd">
+                            <view class="weui-label">
+                                <picker name="dateIndex" mode="selector" value="{{form.unitIndex}}" range="{{unitsRange}}"
+                                        data-formkey="unitIndex" bindchange="apply">
+                                    <view class="picker">
+                                        <text class="weui-badge weui-badge_dot"
+                                              style="line-height: 16rpx;height: 36rpx; padding-top: 0; margin-right: 10rpx;" >
+                                            {{form.weight_unit}}
+                                        </text>
+                                        <text class="weui-cell_link">切换</text>
+                                    </view>
+                                </picker>
+                            </view>
+                        </view>
+
                     </view>
-                    <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
-                        <view class="weui-media-box__title">标题二</view>
-                        <view class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</view>
+                    <view class="weui-cell weui-cell_input">
+                        <view class="weui-cell__bd">
+
+                        </view>
+                        <view class="weui-cell__hd">
+                            <button class="weui-btn mini-btn" type="primary" formType="submit">确定</button>
+                        </view>
+
                     </view>
-                </navigator>
-            </view>
-            <view class="weui-panel__ft">
-                <view class="weui-cell weui-cell_access weui-cell_link">
-                    <view class="weui-cell__bd">查看更多</view>
-                    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                </view>
+            </form>
+            <view class="weui-panel weui-panel_access" wx:if="{{purchase.orders[0].items.length>0}}">
+                <view class="weui-cells__title">采购列表</view>
+                <view class="weui-cells weui-cells_after-title" wx:for="{{purchase.orders[0].items}}" wx:key="key">
+                    <view class="weui-cell">
+                        <view class="weui-cell__bd">{{item.name}} ({{item.weight/10}}{{item.weight_unit}})</view>
+                        <view class="weui-cell__ft">
+                            <button class="weui-btn mini-btn" type="default"
+                                    data-item-id="{{item.id}}" @tap="removeItem">
+                                取消
+                            </button>
+                        </view>
+                    </view>
                 </view>
             </view>
         </view>
@@ -37,39 +118,261 @@
 <script>
     import wepy from 'wepy'
     import URI from '../../util/uri'
-    import dda from '../data'
+    import daa from '../data'
+    import WxValidate from  '../../util/WxValidate';
     export default class Order extends wepy.page {
         config = {
             navigationBarTitleText: '采购信息'
         }
         data = {
-            act_id:23
+            act_id:23,
+            purchase:null,
+            address:null,
+            unitsRange:daa.units,
+            inputShowed:false,
+            form:{
+                unitIndex: 0,
+                weight_unit: daa.units[0],
+                weight:0.5,
+                name:"",
+                distributionIndex:-1,
+                distribution:"",
+                commission:"",
+            },
+            inputList:[],
+            showTopTips:false,
+            showTopTipsMsg:"出错了",
         }
         onLoad(option) {
+            //this.validateInit();
             if(typeof option.act_id!='undefined'){
                 this.act_id=option.act_id;
             }
             this.getActivityOrder(this.act_id);
         }
+        validateInit(type="ALL"){
+            // 验证字段的规则
+            let rules = {
+                name: {
+                    required: true
+                },
+                weight: {
+                    required: true
+                },
+                weight_unit: {
+                    required: true
+                },
+                commission: {
+                    required: true,
+                    min:this.purchase.commission,
+                    number:true,
+                },
+                distribution: {
+                    required: true
+                },
+            }
+
+// 验证字段的提示信息，若不传则调用默认的信息
+            let messages = {
+                name: {
+                    required: '请填写商品名称'
+                },
+                weight: {
+                    required: '请填写数量'
+                },
+                weight_unit: {
+                    required: '请填写数量单位'
+                },
+                commission: {
+                    required: '请填写佣金',
+                    min: '佣金最少'+this.purchase.commission+'元',
+                    number: '佣金必须是数字'
+                },
+                distribution: {
+                    required: '请选择配送方式'
+                },
+            }
+            if(type!='ALL'){
+                rules = {
+                    commission: {
+                        required: true,
+                        min:this.purchase.commission,
+                        number:true,
+                    },
+                    distribution: {
+                        required: true
+                    },
+                }
+                messages = {
+                    commission: {
+                        required: '请填写佣金',
+                        min: '佣金最少'+this.purchase.commission+'元',
+                        number: '佣金必须是数字'
+                    },
+                    distribution: {
+                        required: '请选择配送方式'
+                    },
+                }
+            }
+
+// 创建实例对象
+            this.WxValidate = new WxValidate(rules, messages)
+        }
         async getActivityOrder(act_id){
             let that=this;
             let params={
-                url:URI.purchaseOrder,
+                url:URI.purchaseMyOrder,
                 data:{act_id:act_id},
             }
             wepy.request(params).then(function (res) {
                 console.log('purchase：', res)
-                that.purchase=res;
+                that.setActivityOrderData(res);
+            });
+        }
+        setActivityOrderData(res){
+            let that=this;
+            that.purchase=res;
+            that.form.commission=res.commission;
+            if(res.orders.length>0){
+                that.form.commission=res.orders[0].commission;
+                that.form.distributionIndex=res.distribution.indexOf(res.orders[0].distribution)
+                console.log('that.form.distributionIndex',that.form.distributionIndex);
+                that.form.distribution=res.orders[0].distribution;
+            }
+            that.form.name="";
+            that.form.weight=0.5;
+            that.$apply();
+        }
+        async getItemName(name){
+            let that=this;
+            let params={
+                url:URI.itemName,
+                data:{name:name},
+            }
+            wepy.request(params).then(function (res) {
+                console.log('purchase：', res)
+                that.inputList=res;
                 that.$apply();
             });
         }
+        inputTyping (e) {
+            console.log(e);
+            this.form.name=e.detail.value;
+            if(e.detail.value){
+                this.inputShowed=true;
+                this.getItemName(e.detail.value);
+            }else{
+                this.inputShowed=false;
+            }
+            this.$apply();
+        }
+        checkedInputVal(e){
+            console.log(e);
+            this.form.name=e.target.dataset.value;
+            this.inputShowed=false;
+            this.$apply();
+        }
+        showTopTipsFun(msg='出错了'){
+            var that = this;
+            this.showTopTipsMsg= msg;
+            this.showTopTips= true
+            this.$apply();
+            setTimeout(function(){
+                this.showTopTipsMsg= '出错了';
+                that.showTopTips= false;
+                that.$apply();
+            }, 3000);
+        }
+        submitOrderSetting(e){
+            console.log('submitOrderSetting：', e.detail.value);
+            if (!this.WxValidate.checkForm(e)) {
+                const error = this.WxValidate.errorList[0];
+                console.log('WxValidate-error', error)
+                this.showTopTipsFun(error.msg);
+                return false
+            }
+            let data={
+                address:this.address,
+                commission:e.detail.value.commission,
+                distribution:this.form.distribution,
+                act_id:this.act_id,
+                sub_type:'orderSetting'
+            };
+
+            let params={
+                url:URI.purchaseMyOrderSet,
+                data:data,
+            }
+            wepy.request(params).then(function (res) {
+                console.log('purchaseMyOrderSet：', res)
+            });
+        }
+        async chooseAddress() {
+            if(this.address!=null) return;
+            let that = this;
+            wepy.chooseAddress().then(function (res) {
+                console.log('chooseAddress', res);
+                that.address=res;
+
+            }).catch(function () {
+                that.$parent.authSetting().then(function () {
+                    that.chooseAddress();
+                });
+            })
+        }
         methods = {
 
-            handlerGetUserInfo(res){
-                console.log(res)
+            apply(e){
+                console.log('apply', e);
+                let formkey = e.target.dataset.formkey;
+                this.form[formkey] = e.detail.value;
+                this.form.weight_unit = this.unitsRange[this.form.unitIndex];
+                this.form.distribution = this.purchase.distribution[this.form.distributionIndex];
+                if('distributionIndex'==formkey
+                    && this.form.distribution=='送货到家'){
+                    this.chooseAddress();
+                }
+                this.$apply();
             },
-            handlerGetPhone(res){
-                console.log(res)
+            formSubmit(e){
+                console.log('formSubmit：', e,e.detail.target.dataset.formkey)
+                let formkey = e.detail.target.dataset.formkey;
+                if(formkey=='orderSetting'){
+                    this.validateInit('orderSetting');
+                    return this.submitOrderSetting(e);
+                }
+                this.validateInit();
+                if (!this.WxValidate.checkForm(e)) {
+                    const error = this.WxValidate.errorList[0];
+                    console.log('WxValidate-error', error)
+                    this.showTopTipsFun(error.msg);
+                    return false
+                }
+                this.form.act_id=this.act_id;
+                this.form.address=this.address;
+                let params={
+                    url:URI.purchaseMyOrderSet,
+                    data:this.form,
+                }
+                let that=this;
+                wepy.request(params).then(function (res) {
+                    console.log('purchaseMyOrderSet：', res)
+                    that.setActivityOrderData(res);
+                });
+            },
+            removeItem(e){
+                console.log(e)
+                let params={
+                    url:URI.purchaseMyOrderDel,
+                    data:{
+                        item_id:e.target.dataset.itemId
+                    },
+                }
+                let that=this;
+                wepy.request(params).then(function (res) {
+                    console.log('purchaseMyOrderSet：', res)
+                    that.setActivityOrderData(res);
+                });
             }
         }
     }

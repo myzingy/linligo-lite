@@ -116,6 +116,15 @@
                         throw new Error('401');
                         return false;
                     }
+                    if(p.statusCode>=500){
+                        wepy.showToast({
+                            title: p.data.message,
+                            icon: 'none',
+                            duration: 2000
+                        });
+                        throw new Error('500');
+                        return false;
+                    }
                     return p.data;
                 },
 

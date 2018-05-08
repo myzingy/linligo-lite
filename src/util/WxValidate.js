@@ -70,7 +70,7 @@ class WxValidate {
                 if (!that.depend(param)) {
                     return 'dependency-mismatch'
                 }
-                return value.length > 0
+                return value.length > 0 || value>0
             },
             /**
              * 验证电子邮箱格式
@@ -329,7 +329,6 @@ class WxValidate {
                 if (result === 'dependency-mismatch') {
                     continue
                 }
-
                 // 判断是否通过验证，否则缓存错误信息，跳出循环
                 if (!result) {
                     this.formatTplAndAdd(param, rule, value)

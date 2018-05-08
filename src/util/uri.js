@@ -23,5 +23,10 @@ export default {
 
     purchaseCreate:{act:'activity',code:'10004',type:'POST',timeout:0},
     purchase:{act:'activity/{id}',code:'10005',type:'GET',timeout:0},
-    purchaseOrder:{act:'order/{act_id}',code:'10006',type:'GET',timeout:0},
+    purchaseMyOrder:{act:'activity/myOrder/{act_id}',code:'10006',type:'GET',timeout:0},
+    purchaseMyOrderSet:{act:'activity/myOrder',code:'10007',type:'POST',timeout:0,silence:true},
+    purchaseMyOrderDel:{act:'activity/myOrder/{item_id}',code:'10008',type:'DELETE',timeout:0},
+
+
+    itemName:{act:'itemName/{name}',code:'11000',type:'GET',timeout:0,silence:true},
 }
