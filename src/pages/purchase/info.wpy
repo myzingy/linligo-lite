@@ -84,9 +84,24 @@
                                 <view>采购</view>
                             </button>
                         </view>
-                        <view class="weui-flex__item" style="margin: 0 20rpx">
-                            <button type="warn" open-type="getPhoneNumber" bindgetphonenumber="handlerNewOrder" wx:if="{{!hasPhone}}">帮我也带些</button>
-                            <button type="warn" @tap="navigateToOrder" wx:else="">帮我也带些</button>
+                        <view class="weui-flex__item" style="margin: 0 20rpx" >
+                            <view wx:if="{{purchase.status==0}}">
+                                <button type="warn" open-type="getPhoneNumber"
+                                        bindgetphonenumber="handlerNewOrder" wx:if="{{!hasPhone}}">
+                                    {{purchase.hasMyItems>0?'查看/修改 商品':'帮我也带些'}}
+                                </button>
+                                <button type="warn" @tap="navigateToOrder" wx:else="">
+                                    {{purchase.hasMyItems>0?'查看/修改 商品':'帮我也带些'}}
+                                </button>
+                            </view>
+                            <view wx:else="" style="text-align: center; vertical-align: middle;">
+                                <button type="warn" @tap="navigateToOrder" wx:if="{{purchase.hasMyItems>0}}">
+                                    查看采购商品
+                                </button>
+                                <view wx:else="">
+                                    活动状态为{{status}}，已不能参
+                                </view>
+                            </view>
                         </view>
                         <view>
                             <button type="primary" open-type="share"
@@ -102,7 +117,7 @@
                         <view class="weui-form-preview__label"></view>
                         <view class="weui-form-preview__value" style="font-size: 20rpx;">红包可用于抵扣金额</view>
                     </view>
-                    <button type="primary" @tap="startPurchase">到市场了，开始采购</button>
+                    <button type="primary" @tap="startPurchase" wx:if="{{purchase.status==0 && hasShare}}">到市场了，开始采购</button>
                 </view>
             </view>
         </view>
