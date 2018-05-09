@@ -157,14 +157,25 @@
         }
         onShow() {
             console.log('info-onShow',arguments);
+            if(!this.userInfo){
+                this.$parent.getStorageInit();
+                this.hasPhone=this.$parent.globalData.phone;
+                this.userInfo=this.$parent.globalData.userInfo;
+            }
             this.$parent.bindShareOpenid();
             this.getActivity(this.id);
         }
         onShareAppMessage() {
+            if(!this.userInfo){
+                this.$parent.getStorageInit();
+                this.hasPhone=this.$parent.globalData.phone;
+                this.userInfo=this.$parent.globalData.userInfo;
+            }
+            console.log('onShareAppMessage',this.userInfo);
             if(this.hasShare){
                 return {
-                    //title: '自定义转发标题',
-                    //path: '/page/user?id=123',
+                    title: this.purchase.slogan,
+                    path: '/pages/purchase?id='+this.id+'&share_openid='+this.userInfo.openId,
                     success: function(res) {
                         // 转发成功
                     },
@@ -175,7 +186,7 @@
             }
             return {
                 title: '邻里逛市场',
-                path: '/page/user?id=123',
+                path: '/pages/index?share_openid='+this.userInfo.openId,
                 success: function(res) {
                     // 转发成功
                 },

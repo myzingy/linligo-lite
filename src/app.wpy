@@ -53,7 +53,6 @@
     export default class extends wepy.app {
         config = {
             pages: [
-                'pages/me/index',
 
                 'pages/index',
 
@@ -62,6 +61,7 @@
                 'pages/purchase/new',
 
                 'pages/me/purchase',
+                'pages/me/index',
 
 
             ],
@@ -157,17 +157,14 @@
             //this.testAsync();
             this.checkLoginState();
             //
-            let that=this;
-            wepy.getStorage({key:'userinfo'}).then(function (res) {
-                console.log('globalData.userInfo',res);
-                that.globalData.userInfo=res.data;
-            })
-            wepy.getStorage({key:'phone'}).then(function (res) {
-                console.log('globalData.phone',res);
-                that.globalData.phone=res.data;
-            })
+            this.getStorageInit();
         }
-
+        getStorageInit(){
+            this.globalData.userInfo=wepy.getStorageSync('userinfo');
+            console.log('globalData.userInfo',this.globalData.userInfo);
+            this.globalData.phone=wepy.getStorageSync('phone');
+            console.log('globalData.phone',this.globalData.phone);
+        }
         sleep(s) {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
@@ -239,7 +236,7 @@
                             }
                             console.log('.......',url,_params);
                             wepy.reLaunch({url:url});
-                        });
+                        }).catch((res)=>{console.log('getStorage.params fail');});
 
                         return true;
                     } catch (e) {
@@ -352,6 +349,8 @@
                         wepy.setStorage({key:'share_openid',data:'binded'})
                     });
                 }
+            }).catch((res)=>{
+                console.log('getStorage.share_openid fail');
             });
         }
     }

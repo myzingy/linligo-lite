@@ -142,6 +142,7 @@
             footer: footer,
         }
         data = {
+            userInfo:null,
             hasPhone:"",
             indicatorDots: true,
             autoplay: true,
@@ -171,9 +172,15 @@
             ]
         }
         onShareAppMessage() {
+            if(!this.userInfo){
+                this.$parent.getStorageInit();
+                this.hasPhone=this.$parent.globalData.phone;
+                this.userInfo=this.$parent.globalData.userInfo;
+            }
+            console.log('onShareAppMessage',this.userInfo);
             return {
                 title: '邻里逛市场',
-                path: '/pages/index?share_openid=',
+                path: '/pages/index?share_openid='+this.userInfo.openId,
                 success: function(res) {
                     // 转发成功
                 },
@@ -183,6 +190,7 @@
             }
         }
         onLoad(option) {
+            this.userInfo=this.$parent.globalData.userInfo;
             this.hasPhone=this.$parent.globalData.phone;
             if(typeof option.share_openid!='undefined'){
                 this.share_openid=option.share_openid;
@@ -193,6 +201,11 @@
             }
         }
         onShow(){
+            if(!this.userInfo){
+                this.$parent.getStorageInit();
+                this.hasPhone=this.$parent.globalData.phone;
+                this.userInfo=this.$parent.globalData.userInfo;
+            }
             this.$parent.bindShareOpenid();
         }
         navigateToNew(){
