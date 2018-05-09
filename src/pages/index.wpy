@@ -105,7 +105,7 @@
 
             <view class="weui-panel weui-panel_access">
                 <view class="weui-article">
-                    <view class="weui-article__h1" style="margin-bottom: 0">邻里逛市场</view>
+                    <view class="weui-article__h3" style="margin-bottom: 0">“邻里逛市场”为你解决繁琐的记录及合并购买</view>
                     <view class="setp">
                         <view class="line"></view>
                         <view class="cricle-box">

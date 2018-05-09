@@ -1,0 +1,77 @@
+<style lang="less">
+    .mini-btn{
+        padding: 15rpx;
+        line-height: 40rpx;
+    }
+</style>
+<template>
+    <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
+        <view class="page__bd">
+            <view class="weui-panel">
+                <view class="weui-panel__hd">采购活动-{{type==1?'我发起的':'我参与的'}}</view>
+                <view class="weui-panel__bd">
+                        <view class="weui-media-box weui-media-box_text" wx:for="{{purchase}}" wx:key="key">
+                            <navigator url="../purchase/info?id={{item.id}}">
+                                <view class="weui-media-box__title weui-media-box__title_in-text">{{item.slogan}}</view>
+                                <view class="weui-media-box__desc">
+                                    <view>{{item.goto}}，{{item.stime}} 至 {{item.etime}}</view>
+                                    <view>{{item.city}}·{{item.region}}</view>
+                                </view>
+                                <view class="weui-media-box__info">
+                                    <view class="weui-media-box__info__meta">{{status[item.status]}}</view>
+                                    <view class="weui-media-box__info__meta weui-media-box__info__meta_extra">佣金：{{item.commission}}元</view>
+                                    <view class="weui-media-box__info__meta weui-media-box__info__meta_extra">{{item.distribution}}</view>
+                                </view>
+                            </navigator>
+                        </view>
+                </view>
+            </view>
+        </view>
+    </view>
+    <footer></footer>
+</template>
+<script>
+    import wepy from 'wepy'
+    import URI from '../../util/uri'
+    import footer from '../../components/footer';
+    import daa from '../data'
+    export default class Purchase extends wepy.page {
+        config = {
+            navigationBarTitleText: '采购活动'
+        }
+        components = {
+            footer: footer,
+        }
+        data = {
+            type:"",
+            purchase:[],
+            status:daa.activityStatus
+        }
+        onLoad(option) {
+            this.type=option.type;
+            this.getMyPurchase();
+        }
+        onShow(){
+        }
+        getMyPurchase(){
+            let params={
+                url:URI.purchase,
+                data:{
+                    id:"",
+                    type:this.type
+                },
+            }
+            wepy.request(params).then((res)=>{
+                for(let i in res){
+                    res[i].stime=res[i].stime.substr(5,11)
+                    res[i].etime=res[i].etime.substr(5,11)
+                }
+                this.purchase=res;
+                this.$apply();
+            });
+        }
+        methods = {
+
+        }
+    }
+</script>
