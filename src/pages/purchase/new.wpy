@@ -128,15 +128,20 @@
             </form>
         </view>
     </view>
+    <footer></footer>
 </template>
 <script>
     import wepy from 'wepy'
     import URI from '../../util/uri'
     import daa from '../data';
     import WxValidate from  '../../util/WxValidate';
+    import footer from '../../components/footer';
     export default class Info extends wepy.page {
         config = {
             navigationBarTitleText: '采购信息'
+        }
+        components = {
+            footer:footer,
         }
         data = {
             location: {},

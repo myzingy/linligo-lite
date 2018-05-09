@@ -20,7 +20,9 @@
                     <view class="weui-cell weui-cell_access">
                         <view class="weui-cell__bd color-red">{{stime}} 前往 {{purchase.goto}}，大约 {{etime}} 返回</view>
                         <view class="weui-cell__ft weui-cell__ft_in-access" style="font-size: 0">
-                            <view class="color-green" style="display: inline-block;vertical-align:middle; font-size: 28rpx;">个人<view>中心</view></view>
+                            <navigator url="/pages/me/index">
+                                <view class="color-green" style="display: inline-block;vertical-align:middle; font-size: 28rpx;">个人<view>中心</view></view>
+                            </navigator>
                         </view>
                     </view>
                 </view>
@@ -105,14 +107,19 @@
             </view>
         </view>
     </view>
+    <footer></footer>
 </template>
 <script>
     import wepy from 'wepy'
     import URI from '../../util/uri'
     import daa from '../data'
+    import footer from '../../components/footer';
     export default class Info extends wepy.page {
         config = {
             navigationBarTitleText: '采购信息'
+        }
+        components = {
+            footer:footer,
         }
         data = {
             userInfo:{},
@@ -135,6 +142,7 @@
         }
         onShow() {
             console.log('info-onShow',arguments);
+            this.$parent.bindShareOpenid();
             this.getActivity(this.id);
         }
         onShareAppMessage() {
@@ -160,9 +168,6 @@
                     // 转发失败
                 }
             }
-        }
-        initPage(){
-            this.getActivity(this.id);
         }
         async getActivity(id){
             let that=this;
@@ -208,18 +213,21 @@
                 url: '../address'
             })
         }
-        async setPhoneNumber(res){
+        setPhoneNumber(res){
             console.log(res);
-            if(res.detail.iv){
-                let params={
-                    url:URI.setPhoneNumber, //自己服务器维护用户登录状态地址
-                    data:res.detail,
+            return new Promise(function(resole,reject){
+                if(res.detail.iv){
+                    let params={
+                        url:URI.setPhoneNumber, //自己服务器维护用户登录状态地址
+                        data:res.detail,
+                    }
+                    wepy.request(params).then(function(res){
+                        console.log('setPhoneNumber',res);
+                        wepy.setStorage({key:'phone',data:res.phoneNumber});
+                        resole();
+                    });
                 }
-                wepy.request(params).then(function(res){
-                    console.log('setPhoneNumber',res);
-                    wepy.setStorage({key:'phone',data:res.phoneNumber});
-                });
-            }
+            });
         }
         navigateToNew(){
             wepy.navigateTo({
@@ -236,8 +244,10 @@
                 this.setPhoneNumber(res);
             },
             handlerNewActivity(res){
-                this.setPhoneNumber(res);
-                this.navigateToNew();
+                let that=this;
+                this.setPhoneNumber(res).then(function(){
+                    that.navigateToNew();
+                });
             },
             handlerNewOrder(res){
                 this.setPhoneNumber(res);

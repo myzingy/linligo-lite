@@ -38,6 +38,10 @@
         padding-top:20rpx;
         padding-bottom:20rpx;
     }
+    .mini-btn{
+        margin-right: 5px;
+        line-height: inherit;
+    }
 
 </style>
 
@@ -49,12 +53,12 @@
     export default class extends wepy.app {
         config = {
             pages: [
-                'pages/index',
                 'pages/purchase/info',
+                'pages/me/index',
+                'pages/index',
+
                 'pages/purchase/order',
                 'pages/purchase/new',
-
-                'pages/address',
 
 
             ],
@@ -330,8 +334,22 @@
             });
 
         }
-        initPage(){
-            console.log('app-initPage');
+        bindShareOpenid(){
+            wepy.getStorage({key:'share_openid'}).then(function (_Storage) {
+                let share_openid = _Storage.data;
+                if(share_openid){
+                    if(share_openid=='binded') return;
+                    let params={
+                        url:URI.miniLogin,
+                        data:{
+                            share_openid:share_openid
+                        }
+                    }
+                    wepy.request(params).then(res => {
+                        wepy.setStorage({key:'share_openid',data:'binded'})
+                    });
+                }
+            });
         }
     }
 </script>

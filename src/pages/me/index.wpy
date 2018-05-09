@@ -1,0 +1,110 @@
+<style lang="less">
+    .mini-btn{
+        padding: 15rpx;
+        line-height: 40rpx;
+    }
+</style>
+<template>
+    <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
+        <view class="page__bd">
+            <view class="weui-panel weui-panel_access">
+                <view class="weui-panel__bd">
+                    <view class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
+                        <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
+                            <image src="{{wxuser.userinfo.avatarUrl}}" class="weui-media-box__thumb"></image>
+                        </view>
+                        <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
+                            <view class="weui-media-box__title">{{wxuser.userinfo.nickName}}</view>
+                            <view class="weui-media-box__desc"></view>
+                        </view>
+
+                    </view>
+                </view>
+                <view class="weui-form-preview__ft">
+                    <navigator class="weui-form-preview__btn weui-form-preview__btn_primary">
+                        收入（¥{{wxuser.user.money/100}}）
+                    </navigator>
+                    <navigator class="weui-form-preview__btn color-red">
+                        红包（¥{{wxuser.user.red_packet/100}}）
+                    </navigator>
+                </view>
+            </view>
+
+            <view class="weui-panel">
+                <view class="weui-panel__hd">采购活动</view>
+                <view class="weui-panel__bd">
+                    <view class="weui-media-box weui-media-box_small-appmsg">
+                        <view class="weui-cells weui-cells_in-small-appmsg">
+                            <navigator url="" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+                                <view class="weui-cell__hd" style="line-height: 20rpx;margin-right: 10rpx;">
+                                    <icon type="success" size="20"></icon>
+                                </view>
+                                <view class="weui-cell__bd weui-cell_primary">
+                                    <view>我发起的</view>
+                                </view>
+                                <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                            </navigator>
+                            <navigator url="" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+                                <view class="weui-cell__hd" style="line-height: 20rpx;margin-right: 10rpx;">
+                                    <icon type="info" size="20"></icon>
+                                </view>
+                                <view class="weui-cell__bd weui-cell_primary">
+                                    <view>我参与的</view>
+                                </view>
+                                <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                            </navigator>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+    <footer></footer>
+</template>
+<script>
+    import wepy from 'wepy'
+    import URI from '../../util/uri'
+    import footer from '../../components/footer';
+    export default class MeIndex extends wepy.page {
+        config = {
+            navigationBarTitleText: '个人中心'
+        }
+        components = {
+            footer: footer,
+        }
+        data = {
+            wxuser:"",
+        }
+        onShareAppMessage() {
+            return {
+                title: '邻里逛市场',
+                path: '/pages/index?share_openid=',
+                success: function(res) {
+                    // 转发成功
+                },
+                fail: function(res) {
+                    // 转发失败
+                }
+            }
+        }
+        onLoad(option) {
+
+        }
+        onShow(){
+            this.getUser();
+        }
+        getUser(){
+            let params={
+                url:URI.user,
+                data:{},
+            }
+            wepy.request(params).then((res)=>{
+                this.wxuser=res;
+                this.$apply();
+            });
+        }
+        methods = {
+
+        }
+    }
+</script>

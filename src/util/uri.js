@@ -16,17 +16,18 @@ export default {
         base_url=base_url.replace(/\/+$/,'');
         return base_url;
     },
-    user:{act:'user',code:'10000',type:'GET',timeout:0},
+    user:{act:'wxuser',code:'10000',type:'GET',timeout:0},
     refreshToken:{act:'wxuser/refreshToken',code:'10001',type:'POST',timeout:0},
     miniLogin:{act:'wxuser/miniLogin',code:'10002',type:'GET',timeout:0,silence:true},
-    setPhoneNumber:{act:'wxuser/setPhoneNumber',code:'10003',type:'POST',timeout:0,silence:true},
+    setPhoneNumber:{act:'wxuser/setPhoneNumber',code:'10003',type:'POST',timeout:0,silence:false},
+    setShareOpenid:{act:'wxuser/setShareOpenid',code:'10004',type:'POST',timeout:0,silence:true},
 
-    purchaseCreate:{act:'activity',code:'10004',type:'POST',timeout:0},
-    purchase:{act:'activity/{id}',code:'10005',type:'GET',timeout:0},
-    purchaseMyOrder:{act:'activity/myOrder/{act_id}',code:'10006',type:'GET',timeout:0},
-    purchaseMyOrderSet:{act:'activity/myOrder',code:'10007',type:'POST',timeout:0,silence:true},
-    purchaseMyOrderDel:{act:'activity/myOrder/{item_id}',code:'10008',type:'DELETE',timeout:0},
+    purchaseCreate:{act:'activity',code:'11000',type:'POST',timeout:0},
+    purchase:{act:'activity/{id}',code:'11001',type:'GET',timeout:0},
+    purchaseMyOrder:{act:'activity/myOrder/{act_id}',code:'11002',type:'GET',timeout:0},
+    purchaseMyOrderSet:{act:'activity/myOrder',code:'11003',type:'POST',timeout:0,silence:true},
+    purchaseMyOrderDel:{act:'activity/myOrder/{item_id}',code:'11004',type:'DELETE',timeout:0},
 
 
-    itemName:{act:'itemName/{name}',code:'11000',type:'GET',timeout:0,silence:true},
+    itemName:{act:'itemName/{name}',code:'12000',type:'GET',timeout:0,silence:true},
 }

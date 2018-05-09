@@ -15,10 +15,6 @@
     .searchbar-result:before{
         display: none;
     }
-    .mini-btn{
-        margin-right: 5px;
-        line-height: inherit;
-    }
 </style>
 <template>
     <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">

@@ -1,16 +1,100 @@
 <style lang="less">
+    .setp{
+        position: relative;
+        .line{
+            border-bottom: 1px solid #ccc;
+            height: 50rpx;
+            margin-bottom: 100rpx;
+        }
+        .cricle-box{
+            /*display: flex;*/
+            /*flex-direction: row;*/
+            /*justify-content: space-around;*/
+            /*align-items: center;*/
+            position: absolute;
+            top:25rpx;
+            width: 100%;
+            .box{
+                float: left;
+                width: 30%;
+                margin-right: 4%;
+                text-align: center;
+                &:last-child{
+                    margin-right: 0;
+                }
+                .info{
+                    margin-top: 20rpx;
+                }
+                .cricle{
+                    border: 1px solid #ccc;
+                    width:50rpx;
+                    height:50rpx;
+                    border-radius: 30rpx;
+                    background-color: #fff;
+                    margin: 0 auto;
+                    line-height: 50rpx;
+                }
 
+            }
+        }
+    }
+    .mini-btn{
+        padding: 15rpx;
+        line-height: 40rpx;
+    }
 </style>
 <template>
     <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
         <view class="page__bd">
             <view class="weui-panel weui-panel_access">
+
+                <view class="weui-panel__bd">
+                    <view class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
+
+                        <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
+                            <view class="weui-media-box__title">热心邻里</view>
+                            <view class="weui-media-box__desc">我要去 市场/超市，帮邻里带些东西，请发起采购活动</view>
+                        </view>
+                        <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
+                            <button type="warn" class="weui-btn mini-btn"
+                                    wx:if="{{!hasPhone}}" open-type="getPhoneNumber"
+                                    bindgetphonenumber="handlerNewActivity">
+                                发起采购
+                            </button>
+                            <button type="warn" class="weui-btn mini-btn" wx:else="" @tap="navigateToNew">
+                                发起采购
+                            </button>
+                        </view>
+                    </view>
+                    <view class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
+
+                        <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
+                            <view class="weui-media-box__title">普通业主</view>
+                            <view class="weui-media-box__desc">不能去 市场/超市，又想吃些新鲜健康的，分享给“热心邻里”，让他（她）发起采购活动</view>
+                        </view>
+                        <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
+                            <button type="primary" class="weui-btn mini-btn" open-type="share"> 分享邻里 </button>
+                        </view>
+                    </view>
+                </view>
+                <view class="weui-panel__ft">
+                    <view class="weui-cell weui-cell_access weui-cell_link">
+                        <view class="weui-cell__bd">分享得红包，可用于抵扣菜钱哦</view>
+                        <view class="weui-cell__ft weui-cell__ft_in-access">
+                            <navigator url="/pages/me/index" class="weui-footer__link">我的红包</navigator>
+                        </view>
+                    </view>
+                </view>
+            </view>
+
+            <view class="weui-panel weui-panel_access">
+                <view class="weui-panel__hd">生活场景</view>
                 <view class="weui-article">
                     <swiper indicator-dots="{{indicatorDots}}"
                             autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}">
-                        <block wx:for="{{imgUrls}}">
+                        <block wx:for="{{imgUrls}}" wx:key="key">
                             <swiper-item>
-                                <view wx:for="{{item}}">
+                                <view wx:for="{{item}}" wx:key="key">
                                     <text class="color-green">{{item.name}}</text>：{{item.msg}}
                                 </view>
                             </swiper-item>
@@ -18,16 +102,47 @@
                     </swiper>
                 </view>
             </view>
+
+            <view class="weui-panel weui-panel_access">
+                <view class="weui-article">
+                    <view class="weui-article__h1" style="margin-bottom: 0">邻里逛市场</view>
+                    <view class="setp">
+                        <view class="line"></view>
+                        <view class="cricle-box">
+                            <view class="box">
+                                <view class="cricle">1</view>
+                                <view class="info">发起采购</view>
+                            </view>
+                            <view class="box">
+                                <view class="cricle">2</view>
+                                <view class="info">分享到业主群</view>
+                            </view>
+                            <view class="box">
+                                <view class="cricle">3</view>
+                                <view class="info">开始采购</view>
+                            </view>
+                        </view>
+
+                    </view>
+                </view>
+            </view>
         </view>
     </view>
+    <footer></footer>
 </template>
 <script>
     import wepy from 'wepy'
+    import URI from '../util/uri'
+    import footer from '../components/footer';
     export default class Index extends wepy.page {
         config = {
             navigationBarTitleText: '邻里逛市场'
         }
+        components = {
+            footer: footer,
+        }
         data = {
+            hasPhone:"",
             indicatorDots: true,
             autoplay: true,
             interval: 5000,
@@ -54,6 +169,60 @@
                     {name:"老王头",msg:"西红柿要买多少啊？？？"}
                 ],
             ]
+        }
+        onShareAppMessage() {
+            return {
+                title: '邻里逛市场',
+                path: '/pages/index?share_openid=',
+                success: function(res) {
+                    // 转发成功
+                },
+                fail: function(res) {
+                    // 转发失败
+                }
+            }
+        }
+        onLoad(option) {
+            this.hasPhone=this.$parent.globalData.phone;
+            if(typeof option.share_openid!='undefined'){
+                this.share_openid=option.share_openid;
+                wepy.setStorage({
+                    key:'share_openid',
+                    data:option.share_openid
+                });
+            }
+        }
+        onShow(){
+            this.$parent.bindShareOpenid();
+        }
+        navigateToNew(){
+            wepy.navigateTo({
+                url: './purchase/new'
+            })
+        }
+        setPhoneNumber(res){
+            console.log(res);
+            return new Promise(function(resole,reject){
+                if(res.detail.iv){
+                    let params={
+                        url:URI.setPhoneNumber, //自己服务器维护用户登录状态地址
+                        data:res.detail,
+                    }
+                    wepy.request(params).then(function(res){
+                        console.log('setPhoneNumber',res);
+                        wepy.setStorage({key:'phone',data:res.phoneNumber});
+                        resole();
+                    });
+                }
+            });
+        }
+        methods = {
+            handlerNewActivity(res){
+                let that=this;
+                this.setPhoneNumber(res).then(function(){
+                    that.navigateToNew();
+                });
+            },
         }
     }
 </script>
