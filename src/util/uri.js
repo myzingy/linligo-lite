@@ -28,6 +28,8 @@ export default {
     purchaseMyOrderSet:{act:'activity/myOrder',code:'11003',type:'POST',timeout:0,silence:true},
     purchaseMyOrderDel:{act:'activity/myOrder/{item_id}',code:'11004',type:'DELETE',timeout:0},
 
+    activityPurchase:{act:'activityPurchase',code:'12000',type:'POST',timeout:0},
+
 
     itemName:{act:'itemName/{name}',code:'12000',type:'GET',timeout:0,silence:true},
 }

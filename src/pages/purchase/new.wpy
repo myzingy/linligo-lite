@@ -12,7 +12,8 @@
                             <view class="weui-label">标语</view>
                         </view>
                         <view class="weui-cell__bd">
-                            <input name="slogan" placeholder="如：周末吃些新鲜健康的" value="{{form.slogan}}"/>
+                            <input name="slogan" placeholder="如：周末吃些新鲜健康的"
+                                   value="{{form.slogan}}" data-formkey="slogan" bindchange="apply"/>
                         </view>
                     </view>
                     <view class="weui-cell weui-cell_input">
@@ -20,7 +21,8 @@
                             <view class="weui-label">小区</view>
                         </view>
                         <view class="weui-cell__bd">
-                            <input name="region" placeholder="请输入小区名称" value="{{form.region}}"/>
+                            <input name="region" placeholder="请输入小区名称"
+                                   value="{{form.region}}" data-formkey="region" bindchange="apply"/>
                         </view>
                     </view>
                     <view class="weui-cell weui-cell_input">
@@ -28,7 +30,8 @@
                             <view class="weui-label">去往</view>
                         </view>
                         <view class="weui-cell__bd">
-                            <input name="goto" placeholder="批发市场/超市/商城 名称" value="{{form.goto}}"/>
+                            <input name="goto" placeholder="批发市场/超市/商城 名称"
+                                   value="{{form.goto}}" data-formkey="goto" bindchange="apply"/>
                         </view>
                     </view>
                     <view class="weui-cell weui-cell_input">
@@ -117,7 +120,8 @@
                             <view class="weui-label">佣金</view>
                         </view>
                         <view class="weui-cell__bd">
-                            <slider name="commission" min="1" max="10" show-value value="{{form.commission}}"/>
+                            <slider name="commission" min="1" max="10" show-value
+                                    value="{{form.commission}}" data-formkey="commission" bindchange="apply"/>
                         </view>
                         <text>元</text>
                     </view>
@@ -151,6 +155,7 @@
                 etime: '08:00',
                 dateIndex: 0,
                 dateStr: '',
+                commission:1,
             },
             distribution:daa.distribution,
             types:daa.types,

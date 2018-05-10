@@ -74,6 +74,7 @@
                         </view>
                         <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
                             <button type="primary" class="weui-btn mini-btn" open-type="share"> 分享邻里 </button>
+                            <view class="weui-badge" style="position: absolute;top: 0.5em;right: 2.0em">?</view>
                         </view>
                     </view>
                 </view>
@@ -81,7 +82,9 @@
                     <view class="weui-cell weui-cell_access weui-cell_link">
                         <view class="weui-cell__bd">分享得红包，可用于抵扣菜钱哦</view>
                         <view class="weui-cell__ft weui-cell__ft_in-access">
-                            <navigator url="/pages/me/index" class="weui-footer__link">我的红包</navigator>
+                            <navigator url="/pages/me/index" class="weui-footer__link">
+                                <view class="weui-badge" style="margin-left: 5px;">个人中心</view>
+                            </navigator>
                         </view>
                     </view>
                 </view>

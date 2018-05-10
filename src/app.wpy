@@ -53,12 +53,13 @@
     export default class extends wepy.app {
         config = {
             pages: [
+                'pages/purchase/info',
 
                 'pages/index',
 
-                'pages/purchase/info',
                 'pages/purchase/order',
                 'pages/purchase/new',
+                'pages/purchase/details',
 
                 'pages/me/purchase',
                 'pages/me/index',
@@ -91,7 +92,7 @@
                     if(typeof p.url!='undefined'){
                         if(!p.url.silence){
                             wepy.showLoading({
-                                title: 'climax...',
+                                title: '逛市场中...',
                                 icon: 'loading'
                             })
                         }
@@ -124,13 +125,13 @@
                         throw new Error('401');
                         return false;
                     }
-                    if(p.statusCode>=500){
+                    if(p.statusCode>=401){
                         wepy.showToast({
-                            title: p.data.message,
+                            title: p.data.message?p.data.message:(p.statusCode+' error'),
                             icon: 'none',
                             duration: 2000
                         });
-                        throw new Error('500');
+                        throw new Error(p.statusCode);
                         return false;
                     }
                     return p.data;

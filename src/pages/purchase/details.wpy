@@ -88,10 +88,10 @@
                             <view wx:if="{{purchase.status==0}}">
                                 <button type="warn" open-type="getPhoneNumber"
                                         bindgetphonenumber="handlerNewOrder" wx:if="{{!hasPhone}}">
-                                    {{purchase.hasMyItems>0?'我已订购的商品':'帮我也带些'}}
+                                    {{purchase.hasMyItems>0?'查看/修改 商品':'帮我也带些'}}
                                 </button>
                                 <button type="warn" @tap="navigateToOrder" wx:else="">
-                                    {{purchase.hasMyItems>0?'我已订购的商品':'帮我也带些'}}
+                                    {{purchase.hasMyItems>0?'查看/修改 商品':'帮我也带些'}}
                                 </button>
                             </view>
                             <view wx:else="" style="text-align: center; vertical-align: middle;">
@@ -117,25 +117,11 @@
                         <view class="weui-form-preview__label"></view>
                         <view class="weui-form-preview__value" style="font-size: 20rpx;">红包可用于抵扣金额</view>
                     </view>
+                    <button type="primary" @tap="startPurchase"
+                            wx:if="{{purchase.status<2 && hasShare}}">
+                        {{purchase.status==1?'正在采购，点击进入':'到市场了，开始采购'}}
+                    </button>
                 </view>
-
-                <view class="weui-panel__ft" wx:if="{{purchase.itemsCount>0}}">
-                    <view class="weui-cell weui-cell_access weui-cell_link">
-                        <view class="weui-cell__bd">目前已有 {{purchase.ordersCount}} 人参加，共计 {{purchase.itemsCount}} 件商品</view>
-                        <view class="weui-cell__ft weui-cell__ft_in-access" wx:if="{{hasShare}}">
-                            <navigator url="./orderList?act_id={{purchase.id}}" class="weui-footer__link">
-                                <view class="weui-badge" style="margin-left: 5px;">查看</view>
-                            </navigator>
-                        </view>
-                    </view>
-                    <view class="weui-cell">
-                        <button type="primary" @tap="startPurchase"
-                                wx:if="{{purchase.status<2 && hasShare}}">
-                            {{purchase.status==1?'正在采购，点击进入':'到市场了，开始采购'}}
-                        </button>
-                    </view>
-                </view>
-
             </view>
         </view>
     </view>
@@ -146,7 +132,7 @@
     import URI from '../../util/uri'
     import daa from '../data'
     import footer from '../../components/footer';
-    export default class Info extends wepy.page {
+    export default class Details extends wepy.page {
         config = {
             navigationBarTitleText: '采购信息'
         }
@@ -154,63 +140,15 @@
             footer:footer,
         }
         data = {
-            userInfo:{},
             purchase:{},
-            stime:"",
-            etime:"",
-            status:"",
             id:23,
-            hasPhone:"",
-            hasShare:false,
         }
         onLoad(option) {
-            this.hasPhone=this.$parent.globalData.phone;
-            this.userInfo=this.$parent.globalData.userInfo;
-            console.log('info-onLoad',option,this);
-            if(typeof option.id!='undefined'){
-                this.id=option.id;
-            }
-            wepy.setStorageSync('params',option);
-        }
-        onShow() {
-            console.log('info-onShow',arguments);
-            if(!this.userInfo){
-                this.$parent.getStorageInit();
-                this.hasPhone=this.$parent.globalData.phone;
-                this.userInfo=this.$parent.globalData.userInfo;
-            }
-            this.$parent.bindShareOpenid();
+            this.id=option.id;
             this.getActivity(this.id);
         }
-        onShareAppMessage() {
-            if(!this.userInfo){
-                this.$parent.getStorageInit();
-                this.hasPhone=this.$parent.globalData.phone;
-                this.userInfo=this.$parent.globalData.userInfo;
-            }
-            console.log('onShareAppMessage',this.userInfo);
-            if(this.hasShare){
-                return {
-                    title: this.purchase.slogan,
-                    path: '/pages/purchase?id='+this.id+'&share_openid='+this.userInfo.openId,
-                    success: function(res) {
-                        // 转发成功
-                    },
-                    fail: function(res) {
-                        // 转发失败
-                    }
-                }
-            }
-            return {
-                title: '邻里逛市场',
-                path: '/pages/index?share_openid='+this.userInfo.openId,
-                success: function(res) {
-                    // 转发成功
-                },
-                fail: function(res) {
-                    // 转发失败
-                }
-            }
+        onShow() {
+
         }
         async getActivity(id){
             let that=this;
@@ -228,88 +166,9 @@
                 that.$apply();
             });
         }
-        setTimeStr(){
-            let getDate=function(next = 0) {
-                let d = new Date();
-                if (next > 0) {
-                    d = new Date(d.setDate(d.getDate() + next))
-                }
-                let mm=(d.getMonth() + 1);
-                let dd=d.getDate();
-                return d.getFullYear() + '-' + (mm>10?mm:('0'+mm)) + '-' + (dd>10?dd:('0'+dd));
-            }
-            let day_0=getDate();
-            let day_1=getDate(1);
-            if(this.purchase.stime.indexOf(day_0)>-1){
-                this.stime='今天 '+ this.purchase.stime.substr(11,5);
-            }else if(this.purchase.stime.indexOf(day_1)>-1){
-                this.stime='明天 '+ this.purchase.stime.substr(11,5);
-            }else{
-                this.stime=this.purchase.stime.substr(0,16);
-            }
-            this.etime=this.purchase.etime.substr(11,5);
-        }
 
-        async tapJoin(){
-            //await this.$parent.checkLoginState();
-            wepy.navigateTo({
-                url: '../address'
-            })
-        }
-        setPhoneNumber(res){
-            console.log(res);
-            return new Promise(function(resole,reject){
-                if(res.detail.iv){
-                    let params={
-                        url:URI.setPhoneNumber, //自己服务器维护用户登录状态地址
-                        data:res.detail,
-                    }
-                    wepy.request(params).then(function(res){
-                        console.log('setPhoneNumber',res);
-                        wepy.setStorage({key:'phone',data:res.phoneNumber});
-                        resole();
-                    });
-                }
-            });
-        }
-        navigateToNew(){
-            wepy.navigateTo({
-                url: './new'
-            })
-        }
-        navigateToOrder(){
-            wepy.navigateTo({
-                url: './order?act_id='+this.id
-            })
-        }
         methods = {
-            handlerGetPhone(res){
-                this.setPhoneNumber(res);
-            },
-            handlerNewActivity(res){
-                let that=this;
-                this.setPhoneNumber(res).then(function(){
-                    that.navigateToNew();
-                });
-            },
-            handlerNewOrder(res){
-                this.setPhoneNumber(res);
-                this.navigateToOrder();
-            },
-            startPurchase(){
-                let params={
-                    url:URI.activityPurchase, //自己服务器维护用户登录状态地址
-                    data:{
-                        act_id:this.purchase.id
-                    },
-                }
-                wepy.request(params).then(function(res){
-                    console.log('startPurchase',res);
-                    wepy.navigateTo({
-                        url: './details?id='+res.id
-                    })
-                });
-            }
+
         }
     }
 
