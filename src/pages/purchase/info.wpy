@@ -128,10 +128,10 @@
                             </navigator>
                         </view>
                     </view>
-                    <view class="weui-cell">
-                        <button type="primary" @tap="startPurchase"
-                                wx:if="{{purchase.status<2 && hasShare}}">
-                            {{purchase.status==1?'正在采购，点击进入':'到市场了，开始采购'}}
+                    <view class="weui-cell" wx:if="{{hasShare}}">
+                        <button type="primary" @tap="startPurchase">
+                            {{purchase.status==1?'正在采购，点击进入'
+                            :(purchase.status==0?'到市场了，开始采购':'查看采购清单')}}
                         </button>
                     </view>
                 </view>
@@ -306,7 +306,7 @@
                 wepy.request(params).then(function(res){
                     console.log('startPurchase',res);
                     wepy.navigateTo({
-                        url: './details?id='+res.id
+                        url: './details?act_id='+res.act_id
                     })
                 });
             }

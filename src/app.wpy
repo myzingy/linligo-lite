@@ -53,10 +53,12 @@
     export default class extends wepy.app {
         config = {
             pages: [
-                'pages/purchase/info',
+
+
 
                 'pages/index',
 
+                'pages/purchase/info',
                 'pages/purchase/order',
                 'pages/purchase/new',
                 'pages/purchase/details',
@@ -352,6 +354,28 @@
                 }
             }).catch((res)=>{
                 console.log('getStorage.share_openid fail');
+            });
+        }
+        confirm(obj){
+            if(typeof obj=='string'){
+                obj={
+                    content:obj
+                }
+            }
+            return new Promise(function(resole,reject){
+                wx.showModal({
+                    title: obj.title?obj.title:'确认窗口',
+                    content: obj.content,
+                    confirmText: obj.confirmText?obj.confirmText:'确 认',
+                    cancelText: obj.cancelText?obj.cancelText:'取 消',
+                    success: function (res) {
+                        if (res.confirm) {
+                            resole()
+                        }else{
+                            reject()
+                        }
+                    }
+                });
             });
         }
     }
