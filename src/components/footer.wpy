@@ -4,9 +4,9 @@
 <template>
     <view class="weui-footer">
         <view class="weui-footer__links">
-            <navigator url="/pages/index" class="weui-footer__link">邻里逛市场</navigator>
+            <navigator url="/pages/index" class="weui-footer__link" open-type="redirect">邻里逛市场</navigator>
             |
-            <navigator url="/pages/me/index" class="weui-footer__link">个人中心</navigator>
+            <navigator url="/pages/me/index" class="weui-footer__link" open-type="redirect">个人中心</navigator>
         </view>
         <view class="weui-footer__text">Copyright © 2018</view>
     </view>

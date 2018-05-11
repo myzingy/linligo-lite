@@ -14,6 +14,7 @@
                               data-id="{{item.id}}"
                               data-status="12"
                               data-name="{{item.name}}"
+                              wx:if="{{item.status==0}}"
                               class="color-blue">缺货?</text>
                     </view>
                     <view class="weui-form-preview__value_in-hd">{{item.weightStr}}</view>
@@ -23,7 +24,7 @@
                         <view class="weui-form-preview__value">{{item.weightDetailStr}}</view>
                     </view>
                 </view>
-                <view class="weui-form-preview__ft">
+                <view class="weui-form-preview__ft" wx:if="{{item.status==0}}">
                     <view>
                         <view class="weui-cell weui-cell_warn" style="padding-top: 0; padding-bottom: 0">
                             <view class="weui-cell__bd" style="width: 150rpx;">
@@ -32,7 +33,8 @@
                             <view class="weui-cell__ft">
                                 <input class="weui-input" placeholder=""
                                        data-id="{{item.id}}"
-                                       data-key="{{item.id}}"
+                                       data-key="weight"
+                                       @change="apply"
                                        style="border-bottom: 1px solid #ccc;width: 100rpx;"/>
                             </view>
                             <view class="weui-cell__ft">
@@ -41,6 +43,8 @@
                             <view class="weui-cell__ft">
                                 <input class="weui-input" placeholder=""
                                        data-id="{{item.id}}"
+                                       data-key="price"
+                                       @change="apply"
                                        style="border-bottom: 1px solid #ccc;width: 100rpx;"/>
                             </view>
                             <view class="weui-cell__ft">
@@ -50,15 +54,39 @@
                     </view>
                     <view style="width:250rpx;">
                         <button class="weui-btn mini-btn" type="primary"
-                                wx:if="{{item.status==0}}"
                                 @tap="updateItem"
                                 data-id="{{item.id}}"
                                 data-name="{{item.name}}"
                                 data-status="2"
                                 class="bg-color-blue" style="margin: 2px;">完成采购</button>
+                    </view>
+                </view>
+
+                <view class="weui-form-preview__ft" wx:else="">
+                    <view>
+                        <view class="weui-cell weui-cell_warn" style="padding-top: 0; padding-bottom: 0">
+                            <view class="weui-cell__bd" style="width: 180rpx;">
+                                实际采购
+                            </view>
+                            <view class="weui-cell__ft">
+                                {{item.weight/10}}
+                            </view>
+                            <view class="weui-cell__ft">
+                                斤，共
+                            </view>
+                            <view class="weui-cell__ft">
+                                {{item.price/100}}
+                            </view>
+                            <view class="weui-cell__ft">
+                                元
+                            </view>
+                        </view>
+                    </view>
+                    <view style="width:250rpx;">
                         <view class="weui-form-preview__btn weui-form-preview__btn_primary"
-                              wx:if="{{item.status==2}}"
-                              hover-class="weui-form-preview__btn_active">已完成</view>
+                              hover-class="weui-form-preview__btn_active">
+                            {{status[item.status]}}
+                        </view>
                     </view>
                 </view>
             </view>
@@ -82,6 +110,7 @@
             purchase:{},
             act_id:23,
             actual:{},
+            status:daa.activityStatus
         }
         onLoad(option) {
             if(typeof option.act_id!='undefined'){
@@ -136,23 +165,63 @@
                     msg='确认'+name+'缺货吗？';
                 }
                 if(status==2){
-                    msg='确认'+name+'已采购完成？';
+                    if(typeof this.actual[id] =='undefined'
+                        ||typeof this.actual[id].weight =='undefined'
+                        || typeof this.actual[id].price =='undefined'){
+                        wepy.showToast({
+                            title: '请填写采购重量及金额',
+                            icon:'none',
+                            duration: 2000
+                        })
+                        return;
+                    }
+                    if(/^[\d\.]+$/.test(this.actual[id]['weight'])
+                        && /^[\d\.]+$/.test(this.actual[id]['price'])){
+                        msg='确认'+name+'已采购完成，共 '+this.actual[id]['weight']+' 斤，'
+                            +this.actual[id]['price']+' 元？';
+                    }else{
+                        wepy.showToast({
+                            title: '重量或金额填写错误',
+                            icon:'none',
+                            duration: 2000
+                        })
+                        return;
+                    }
                 }
                 this.$parent.confirm(msg).then(()=>{
                     let that=this;
                     let params={
                         url:URI.activityPurchaseUpdate,
-                        data:{id:id,status:status},
+                        data:{
+                            id:id,
+                            status:status,
+                        },
+                    }
+                    if(status==2){
+                        params.data.weight=this.actual[id]['weight'];
+                        params.data.price=this.actual[id]['price'];
                     }
                     wepy.request(params).then(function (res) {
                         console.log('purchase：', res);
-//                        res.purchases=that.purchaseDataFormat(res.purchases);
-//                        that.purchase=res;
-//                        that.$apply();
+                        res.purchases=that.purchaseDataFormat(res.purchases);
+                        that.purchase=res;
+                        //that.status=daa.activityStatus[res.status];
+                        that.$apply();
                     });
                 }).catch(()=>{
                     console.log('cancel');
                 });
+            },
+            apply(e){
+                console.log('apply', e);
+                let id = e.target.dataset.id;
+                let key = e.target.dataset.key;
+                let val = e.detail.value;
+                if(typeof this.actual[id] =='undefined'){
+                    this.actual[id]={};
+                }
+                this.actual[id][key]=val;
+                //this.$apply();
             },
         }
     }
