@@ -1,0 +1,126 @@
+<style lang="less">
+
+</style>
+<template>
+    <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
+        <view class="page__bd">
+            <view class="weui-panel weui-panel_access" wx:for="{{purchase}}" wx:key="key">
+                <view class="weui-panel__bd">
+                    <view class="weui-media-box weui-media-box_appmsg">
+                        <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
+                            <image class="weui-media-box__thumb" src="{{item.wxuser.userinfo.avatarUrl}}" />
+                        </view>
+                        <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
+                            <view class="weui-media-box__title">{{item.nickname}}</view>
+                            <view class="weui-media-box__desc">
+                                <view class="weui-badge">
+                                    佣金 {{item.commission/100}} 元
+                                </view>
+                                <view class="weui-badge bg-color-blue" style="margin-left: 5px;">
+                                    {{item.distribution}}
+                                </view>
+                                <view class="weui-badge bg-color-green"
+                                      style="margin-left: 5px;" @tap="callPhone" data-phone="{{item.wxuser.phone}}">
+                                    {{item.wxuser.phone}}
+                                </view>
+                            </view>
+                            <view class="weui-media-box__desc" style="margin-top: 5px;" wx:if="{{item.distribution=='送货到家'}}">
+                                <text class="color-blue">配送地址：</text>
+                                {{item.address.userName}}
+                                <view class="weui-badge bg-color-green"
+                                      style="margin-left: 5px;" @tap="callPhone" data-phone="{{item.address.telNumber}}">
+                                    {{item.address.telNumber}}
+                                </view>
+                                <view>
+                                    {{item.address.detailInfo}}
+                                </view>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+                <view class="weui-panel__ft">
+                    <view class="weui-cell weui-cell_access weui-cell_link" wx:for="{{item.items}}" wx:key="item-key">
+                        <view class="weui-cell__bd">{{item.name}} （{{item.weight/10}} {{item.weight_unit}}）</view>
+                        <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                    </view>
+                    <view class="weui-cell weui-cell_access weui-cell_link">
+                        <view class="weui-cell__bd">操作栏</view>
+                        <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                    </view>
+                </view>
+            </view>
+
+        </view>
+    </view>
+    <footer></footer>
+</template>
+<script>
+    import wepy from 'wepy'
+    import URI from '../../util/uri'
+    import daa from '../data'
+    import footer from '../../components/footer';
+    export default class OrderList extends wepy.page {
+        config = {
+            navigationBarTitleText: '采购清单'
+        }
+        components = {
+            footer:footer,
+        }
+        data = {
+            act_id:23,
+            purchase:null,
+        }
+        onLoad(option) {
+            //this.validateInit();
+            if(typeof option.act_id!='undefined'){
+                this.act_id=option.act_id;
+            }
+            this.getActivityOrder(this.act_id);
+        }
+        async getActivityOrder(act_id){
+            let that=this;
+            let params={
+                url:URI.activityOrders,
+                data:{act_id:act_id},
+            }
+            wepy.request(params).then((res) => {
+                console.log('purchase：', res);
+                this.purchase=res;
+                this.$apply();
+            });
+        }
+        methods = {
+
+            apply(e){
+                console.log('apply', e);
+                let formkey = e.target.dataset.formkey;
+                this.form[formkey] = e.detail.value;
+                this.form.weight_unit = this.unitsRange[this.form.unitIndex];
+                this.form.distribution = this.purchase.distribution[this.form.distributionIndex];
+                if('distributionIndex'==formkey
+                    && this.form.distribution=='送货到家'){
+                    this.chooseAddress();
+                }
+                this.$apply();
+            },
+            callPhone(e){
+                console.log('callPhone', e);
+                let phone = e.target.dataset.phone.replace(/[^\d]/g,'');
+                wepy.makePhoneCall({
+                    phoneNumber: phone
+                }).then(()=>{
+                    console.log("拨打电话成功！")
+                }).catch((e)=>{
+                    console.log("拨打电话失败！",e)
+                    if(e.errMsg=='makePhoneCall:fail cancel') return;
+                    wepy.showToast({
+                        title: '拨打电话失败！请手动尝试',
+                        icon:'none',
+                        duration: 2000
+                    })
+                })
+            }
+        }
+    }
+
+</script>

@@ -26,7 +26,7 @@
                 <view class="weui-cells weui-cells_after-title">
                     <view class="weui-cell">
                         <view style="display: flex;flex-direction: row;width: 40%;">
-                            <view style="width:60px; line-height: 30px;">配送:</view>
+                            <view style="width:100rpx; line-height: 30px;" class="color-red">配送:</view>
                             <picker name="distributionIndex" mode="selector" value="{{form.distributionIndex}}" range="{{purchase.distribution}}"
                                     data-formkey="distributionIndex" bindchange="apply">
                                 <view class="picker" style="line-height: 30px;">
@@ -34,13 +34,13 @@
                                 </view>
                             </picker>
                         </view>
-                        <view style="display: flex;flex-direction: row;width: 40%;">
-                            <view style="width:60px; line-height: 30px;">佣金:</view>
-                            <input name="commission" placeholder="输入佣金" style="width: 50px;border-bottom: 1px solid #ccc;"
+                        <view style="display: flex;flex-direction: row;width: 35%;">
+                            <view style="width:100rpx; line-height: 30px;" class="color-red">佣金:</view>
+                            <input name="commission" placeholder="输入佣金" style="width: 30px;border-bottom: 1px solid #ccc;"
                                    value="{{form.commission}}" bindchange="apply" data-formkey="commission"/>
                             <view style="line-height: 30px;">元</view>
                         </view>
-                        <view style="width: 20%;">
+                        <view style="width: 25%;">
                             <button class="weui-btn mini-btn" type="primary"
                                     wx:if="{{purchase.status==0}}"
                                     formType="submit" data-formkey="orderSetting">
@@ -115,15 +115,20 @@
             </view>
         </view>
     </view>
+    <footer></footer>
 </template>
 <script>
     import wepy from 'wepy'
     import URI from '../../util/uri'
     import daa from '../data'
     import WxValidate from  '../../util/WxValidate';
+    import footer from '../../components/footer';
     export default class Order extends wepy.page {
         config = {
             navigationBarTitleText: '采购信息'
+        }
+        components = {
+            footer:footer,
         }
         data = {
             act_id:23,
@@ -139,6 +144,7 @@
                 distributionIndex:-1,
                 distribution:"",
                 commission:"",
+                address:"",
             },
             inputList:[],
             showTopTips:false,
@@ -292,6 +298,7 @@
                 this.showTopTipsFun(error.msg);
                 return false
             }
+            console.log('submitOrderSetting=>this.address',this.address);
             let data={
                 address:this.address,
                 commission:e.detail.value.commission,
@@ -314,7 +321,6 @@
             wepy.chooseAddress().then(function (res) {
                 console.log('chooseAddress', res);
                 that.address=res;
-
             }).catch(function () {
                 that.$parent.authSetting().then(function () {
                     that.chooseAddress();

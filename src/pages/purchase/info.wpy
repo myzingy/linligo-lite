@@ -121,10 +121,15 @@
 
                 <view class="weui-panel__ft" wx:if="{{purchase.itemsCount>0}}">
                     <view class="weui-cell weui-cell_access weui-cell_link">
-                        <view class="weui-cell__bd">目前已有 {{purchase.ordersCount}} 人参加，共计 {{purchase.itemsCount}} 件商品</view>
+                        <view class="weui-cell__bd color-red" wx:if="{{purchase.status==2 && hasShare}}">
+                            已采购完成，请进入派发
+                        </view>
+                        <view class="weui-cell__bd" wx:else="">
+                            目前已有 {{purchase.ordersCount}} 人参加，共计 {{purchase.itemsCount}} 件商品
+                        </view>
                         <view class="weui-cell__ft weui-cell__ft_in-access" wx:if="{{hasShare}}">
                             <navigator url="./orderList?act_id={{purchase.id}}" class="weui-footer__link">
-                                <view class="weui-badge" style="margin-left: 5px;">查看</view>
+                                <view class="weui-badge" style="margin-left: 5px;">{{purchase.status==2?'派发':'查看'}}</view>
                             </navigator>
                         </view>
                     </view>
