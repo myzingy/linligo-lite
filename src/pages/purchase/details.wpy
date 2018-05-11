@@ -26,27 +26,30 @@
                 <view class="weui-form-preview__ft">
                     <view>
                         <view class="weui-cell weui-cell_warn" style="padding-top: 0; padding-bottom: 0">
-                            <view class="weui-cell__bd" style="width: 120rpx;">
+                            <view class="weui-cell__bd" style="width: 150rpx;">
                                 实际采购
                             </view>
-                            <view class="weui-cell__bd">
+                            <view class="weui-cell__ft">
                                 <input class="weui-input" placeholder=""
-                                       style="border-bottom: 1px solid #ccc;"/>
+                                       data-id="{{item.id}}"
+                                       data-key="{{item.id}}"
+                                       style="border-bottom: 1px solid #ccc;width: 100rpx;"/>
                             </view>
                             <view class="weui-cell__ft">
                                 斤
                             </view>
-                            <view class="weui-cell__bd">
+                            <view class="weui-cell__ft">
                                 <input class="weui-input" placeholder=""
-                                       style="border-bottom: 1px solid #ccc;"/>
+                                       data-id="{{item.id}}"
+                                       style="border-bottom: 1px solid #ccc;width: 100rpx;"/>
                             </view>
                             <view class="weui-cell__ft">
                                 元
                             </view>
                         </view>
                     </view>
-                    <view style="width:400rpx;">
-                        <button class="weui-btn" type="primary"
+                    <view style="width:250rpx;">
+                        <button class="weui-btn mini-btn" type="primary"
                                 wx:if="{{item.status==0}}"
                                 @tap="updateItem"
                                 data-id="{{item.id}}"
@@ -78,6 +81,7 @@
         data = {
             purchase:{},
             act_id:23,
+            actual:{},
         }
         onLoad(option) {
             if(typeof option.act_id!='undefined'){

@@ -1,9 +1,10 @@
 export default {
     isProduction:function(){
-        return process.env.NODE_ENV === 'production';
+        console.log('process.env.NODE_ENV',process.env.NODE_ENV);
+        return process.env.NODE_ENV != 'dev';
     },
     cgi:function(uri="",data={}){
-        var base_url=this.isProduction()?"https://linli.vking.wang/api":"http://www.linligo.com/api";
+        var base_url=this.isProduction()?"https://vking.wang/api":"http://www.linligo.com/api";
         if(typeof uri =='string') return base_url.replace('api','')+uri;
         base_url+='/'+uri.act;
         console.log('isProduction',this.isProduction(),base_url);

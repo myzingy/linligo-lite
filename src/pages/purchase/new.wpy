@@ -49,7 +49,7 @@
                     </view>
                     <view class="weui-cell" style="padding-top: 0; padding-bottom: 0;">
                         <view class="weui-cell weui-cell_input" style="width: 48%; padding-left: 0;padding-right: 0">
-                            <view class="weui-cell__hd">
+                            <view class="weui-cell__hd" style="width: 140rpx;">
                                 <view class="weui-label"><icon type="waiting" size="15" color="orange"/>出发</view>
                             </view>
                             <view class="weui-cell__bd">
@@ -62,7 +62,7 @@
                             </view>
                         </view>
                         <view class="weui-cell weui-cell_input" style="width: 48%;padding-left: 0;padding-right: 0">
-                            <view class="weui-cell__hd">
+                            <view class="weui-cell__hd" style="width: 140rpx;">
                                 <view class="weui-label"><icon type="waiting" size="15" color="orange"/>返回</view>
                             </view>
                             <view class="weui-cell__bd">
@@ -82,7 +82,9 @@
                             <view class="weui-cells__title">配送方式</view>
                             <view class="weui-cells weui-cells_after-title">
                                 <checkbox-group bindchange="distributionChange" name="distribution">
-                                    <label class="weui-cell weui-check__label" wx:for="{{distribution}}" wx:key="value">
+                                    <label class="weui-cell weui-check__label"
+                                           style="padding-left: 0; padding-right: 0"
+                                           wx:for="{{distribution}}" wx:key="value">
                                         <checkbox class="weui-check" value="{{item.name}}" checked="{{item.checked}}"/>
 
                                         <view class="weui-cell__hd weui-check__hd_in-checkbox">
@@ -97,11 +99,13 @@
                                 </view>
                             </view>
                         </view>
-                        <view style="width:45%" style="border-left: 1px solid #ccc; padding-left: 5%; margin-left: 4%;">
+                        <view style="width:45%;border-left: 1px solid #ccc; padding-left: 5%; margin-left: 4%;">
                             <view class="weui-cells__title">购买种类</view>
                             <view class="weui-cells weui-cells_after-title">
                                 <checkbox-group bindchange="typesChange" name="types">
-                                    <label class="weui-cell weui-check__label" wx:for="{{types}}" wx:key="value">
+                                    <label class="weui-cell weui-check__label"
+                                           style="padding-left: 0; padding-right: 0"
+                                           wx:for="{{types}}" wx:key="value">
                                         <checkbox class="weui-check" value="{{item.name}}" checked="{{item.checked}}"/>
 
                                         <view class="weui-cell__hd weui-check__hd_in-checkbox">
@@ -116,7 +120,7 @@
                     </view>
 
                     <view class="weui-cell weui-cell_input">
-                        <view class="weui-cell__hd">
+                        <view class="weui-cell__hd" style="width: 80rpx;">
                             <view class="weui-label">佣金</view>
                         </view>
                         <view class="weui-cell__bd">

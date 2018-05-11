@@ -54,17 +54,16 @@
         config = {
             pages: [
 
-
-
+                'pages/purchase/details',
                 'pages/index',
 
                 'pages/purchase/info',
                 'pages/purchase/order',
                 'pages/purchase/new',
-                'pages/purchase/details',
 
-                'pages/me/purchase',
                 'pages/me/index',
+                'pages/me/purchase',
+
 
 
             ],
@@ -157,6 +156,10 @@
         }
 
         onLaunch() {
+            //
+            if(URI.isProduction()){
+                console.log=function(){};
+            }
             //this.testAsync();
             this.checkLoginState();
             //
