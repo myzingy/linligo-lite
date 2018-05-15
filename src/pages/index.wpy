@@ -78,16 +78,16 @@
                         </view>
                     </view>
                 </view>
+                <navigator url="/pages/me/index">
                 <view class="weui-panel__ft">
                     <view class="weui-cell weui-cell_access weui-cell_link">
                         <view class="weui-cell__bd">分享得红包，可用于抵扣菜钱哦</view>
                         <view class="weui-cell__ft weui-cell__ft_in-access">
-                            <navigator url="/pages/me/index" class="weui-footer__link">
-                                <view class="weui-badge" style="margin-left: 5px;">个人中心</view>
-                            </navigator>
+                            <view class="weui-badge" style="margin-left: 5px;">个人中心</view>
                         </view>
                     </view>
                 </view>
+                </navigator>
             </view>
 
             <view class="weui-panel weui-panel_access">

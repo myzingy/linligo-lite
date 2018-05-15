@@ -34,7 +34,8 @@
                                 <input class="weui-input" placeholder=""
                                        data-id="{{item.id}}"
                                        data-key="weight"
-                                       @change="apply"
+                                       @input="apply"
+                                       type="digit"
                                        style="border-bottom: 1px solid #ccc;width: 100rpx;"/>
                             </view>
                             <view class="weui-cell__ft">
@@ -44,7 +45,8 @@
                                 <input class="weui-input" placeholder=""
                                        data-id="{{item.id}}"
                                        data-key="price"
-                                       @change="apply"
+                                       @input="apply"
+                                       type="digit"
                                        style="border-bottom: 1px solid #ccc;width: 100rpx;"/>
                             </view>
                             <view class="weui-cell__ft">
@@ -90,6 +92,20 @@
                     </view>
                 </view>
             </view>
+
+            <navigator url="./orderList?act_id={{purchase.id}}" wx:if="{{purchase.status==2}}">
+                <view class="weui-form-preview">
+
+                    <view class="weui-cell weui-cell_access weui-cell_link" >
+                        <view class="weui-cell__bd color-red">
+                            已采购完成，请进入派发
+                        </view>
+                        <view class="weui-cell__ft weui-cell__ft_in-access">
+                            <view class="weui-badge" style="margin-left: 5px;">派发</view>
+                        </view>
+                    </view>
+                </view>
+            </navigator>
         </view>
     </view>
     <footer></footer>
@@ -108,7 +124,7 @@
         }
         data = {
             purchase:{},
-            act_id:23,
+            act_id:29,
             actual:{},
             status:daa.activityStatus
         }

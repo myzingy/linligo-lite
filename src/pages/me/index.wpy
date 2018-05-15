@@ -3,6 +3,16 @@
         padding: 15rpx;
         line-height: 40rpx;
     }
+    .new-activity{
+        padding-top:10px;
+        padding-bottom:10px;
+        text-align: left;
+        background-color: transparent !important;
+        color:#000000 !important;
+        font-size:100% ;
+        line-height: 100%;
+        border-color: #fff;
+    }
 </style>
 <template>
     <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
@@ -53,6 +63,28 @@
                                 </view>
                                 <view class="weui-cell__ft weui-cell__ft_in-access"></view>
                             </navigator>
+                            <button type="warn" open-type="getPhoneNumber"
+                                    bindgetphonenumber="handlerNewActivity"
+                                    class="weui-cell weui-cell_access new-activity"
+                                    wx:if="{{!hasPhone}}">
+                                <view class="weui-cell__hd" style="line-height: 20rpx;margin-right: 10rpx;">
+                                    <icon type="waiting" size="20" color="orange"></icon>
+                                </view>
+                                <view class="weui-cell__bd weui-cell_primary">
+                                    <view>发起采购</view>
+                                </view>
+                                <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                            </button>
+                            <button type="warn" @tap="navigateToNew" wx:else=""
+                                    class="weui-cell weui-cell_access new-activity">
+                                <view class="weui-cell__hd" style="line-height: 20rpx;margin-right: 10rpx;">
+                                    <icon type="waiting" size="20" color="orange"></icon>
+                                </view>
+                                <view class="weui-cell__bd weui-cell_primary">
+                                    <view>发起采购</view>
+                                </view>
+                                <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                            </button>
                         </view>
                     </view>
                 </view>
@@ -94,6 +126,7 @@
         }
         data = {
             wxuser:"",
+            hasPhone:"",
         }
         onShareAppMessage() {
             return {
@@ -108,10 +141,14 @@
             }
         }
         onLoad(option) {
-
+            this.hasPhone=this.$parent.globalData.phone;
         }
         onShow(){
             this.getUser();
+            if(!this.userInfo){
+                this.$parent.getStorageInit();
+                this.hasPhone=this.$parent.globalData.phone;
+            }
         }
         getUser(){
             let params={
@@ -123,8 +160,34 @@
                 this.$apply();
             });
         }
+        setPhoneNumber(res){
+            console.log(res);
+            return new Promise(function(resole,reject){
+                if(res.detail.iv){
+                    let params={
+                        url:URI.setPhoneNumber, //自己服务器维护用户登录状态地址
+                        data:res.detail,
+                    }
+                    wepy.request(params).then(function(res){
+                        console.log('setPhoneNumber',res);
+                        wepy.setStorage({key:'phone',data:res.phoneNumber});
+                        resole();
+                    });
+                }
+            });
+        }
+        navigateToNew(){
+            wepy.navigateTo({
+                url: '/pages/purchase/new'
+            })
+        }
         methods = {
-
+            handlerNewActivity(res){
+                let that=this;
+                this.setPhoneNumber(res).then(function(){
+                    that.navigateToNew();
+                });
+            },
         }
     }
 </script>

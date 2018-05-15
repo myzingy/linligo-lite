@@ -61,7 +61,7 @@
     import footer from '../../components/footer';
     export default class OrderList extends wepy.page {
         config = {
-            navigationBarTitleText: '采购清单'
+            navigationBarTitleText: '派发清单'
         }
         components = {
             footer:footer,
