@@ -38,6 +38,7 @@ export default {
     activityPurchaseUpdate:{act:'activityPurchase/{id}',code:'12000',type:'PUT',timeout:0},
 
     activityOrders:{act:'activityOrders/{act_id}',code:'12000',type:'GET',timeout:0},
+    activityOrdersSet:{act:'activityOrders/{order_id}',code:'12000',type:'PUT',timeout:0},
 
     itemName:{act:'itemName/{name}',code:'12000',type:'GET',timeout:0,silence:true},
 }

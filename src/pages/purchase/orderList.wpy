@@ -41,15 +41,43 @@
                 <view class="weui-panel__ft">
                     <view class="weui-cell weui-cell_access weui-cell_link" wx:for="{{item.items}}" wx:key="item-key">
                         <view class="weui-cell__bd">{{item.name}} （{{item.weight/10}} {{item.weight_unit}}）</view>
-                        <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                        <!--<view class="weui-cell__ft weui-cell__ft_in-access"></view>-->
                     </view>
-                    <view class="weui-cell weui-cell_access weui-cell_link">
-                        <view class="weui-cell__bd">操作栏</view>
-                        <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                    <view class="weui-cell weui-cell_input weui-cell_vcode">
+                        <view class="weui-cell__hd bg-color-blue color-black-light"
+                              style="width: 140rpx; text-align: center; margin-right: 10rpx;">
+                            <view>{{status[item.status]}}</view>
+                        </view>
+                        <view class="weui-cell__bd">
+                            <input class="weui-input"
+                                   wx:if="{{item.status==0 && act_status==0}}"
+                                   data-order-id="{{item.id}}"
+                                   @input="applyRefuse"
+                                   placeholder="拒绝理由:如佣金请设为10元" />
+                        </view>
+                        <view class="weui-cell__ft">
+                            <view class="weui-vcode-btn">
+                                <button type="warn"
+                                        @tap="activityOrdersSet"
+                                        data-order-id="{{item.id}}"
+                                        data-order-status="11"
+                                        wx:if="{{item.status==0 && act_status==0}}">拒绝</button>
+                                <button type="primary"
+                                        @tap="activityOrdersSet"
+                                        data-order-id="{{item.id}}"
+                                        data-order-status="4"
+                                        wx:if="{{item.status==2}}">已派送</button>
+                            </view>
+                        </view>
                     </view>
                 </view>
             </view>
-
+            <view class="weui-cell" wx:if="{{purchase.length>0}}">
+                <button type="primary" @tap="startPurchase">
+                    {{act_status==1?'正在采购，点击进入'
+                    :(act_status==0?'到市场了，开始采购':'查看采购清单')}}
+                </button>
+            </view>
         </view>
     </view>
     <footer></footer>
@@ -61,19 +89,23 @@
     import footer from '../../components/footer';
     export default class OrderList extends wepy.page {
         config = {
-            navigationBarTitleText: '派发清单'
+            navigationBarTitleText: '采购清单'
         }
         components = {
             footer:footer,
         }
         data = {
-            act_id:23,
+            status:daa.activityStatus,
+            act_id:31,
+            act_status:0,
             purchase:null,
+            refuseInfo:{},
         }
         onLoad(option) {
-            //this.validateInit();
+            console.log('orderList-onLoad',option);
             if(typeof option.act_id!='undefined'){
                 this.act_id=option.act_id;
+                this.act_status=option.act_status;
             }
             this.getActivityOrder(this.act_id);
         }
@@ -91,17 +123,10 @@
         }
         methods = {
 
-            apply(e){
-                console.log('apply', e);
-                let formkey = e.target.dataset.formkey;
-                this.form[formkey] = e.detail.value;
-                this.form.weight_unit = this.unitsRange[this.form.unitIndex];
-                this.form.distribution = this.purchase.distribution[this.form.distributionIndex];
-                if('distributionIndex'==formkey
-                    && this.form.distribution=='送货到家'){
-                    this.chooseAddress();
-                }
-                this.$apply();
+            applyRefuse(e){
+                console.log('applyRefuse', e);
+                let order_id = e.target.dataset.orderId;
+                this.refuseInfo[order_id] = e.detail.value;
             },
             callPhone(e){
                 console.log('callPhone', e);
@@ -119,6 +144,61 @@
                         duration: 2000
                     })
                 })
+            },
+            activityOrdersSet(e){
+                console.log('activityOrdersSet', e);
+                let order_id = e.target.dataset.orderId;
+                let status = e.target.dataset.orderStatus;
+                let params={
+                    url:URI.activityOrdersSet,
+                    data:{
+                        order_id:order_id,
+                        status:status
+                    },
+                }
+                if(status==11){
+                    params.data.info=this.refuseInfo[order_id];
+                    if(!params.data.info){
+                        wepy.showToast({
+                            title: '请填写拒绝理由',
+                            icon: 'none',
+                            duration: 3000
+                        });
+                        return;
+                    }
+                }
+                this.$parent.confirm('确认设置为 '+this.status[status]).then(ok=>{
+                    wepy.request(params).then((res) => {
+                        console.log('purchase：', res);
+                        this.purchase=res;
+                        this.$apply();
+                    });
+                });
+
+            },
+            startPurchase(){
+                if(this.act_status>0){
+                    wepy.navigateTo({
+                        url: './details?act_id='+this.act_id
+                    })
+                    return;
+                }
+                this.$parent.confirm('已检查订单信息，开始采购？').then(ok=>{
+                    let params={
+                        url:URI.activityPurchase, //自己服务器维护用户登录状态地址
+                        data:{
+                            act_id:this.act_id
+                        },
+                    }
+                    wepy.request(params).then((res)=>{
+                        console.log('startPurchase',res);
+                        this.act_status=1;
+                        wepy.navigateTo({
+                            url: './details?act_id='+res.act_id
+                        })
+                    });
+                });
+
             }
         }
     }

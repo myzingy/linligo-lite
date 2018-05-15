@@ -20,9 +20,14 @@
     <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
         <view class="page__bd">
             <view class="weui-toptips weui-toptips_warn" wx:if="{{showTopTips}}">{{showTopTipsMsg}}</view>
+            <view class="weui-toptips_warn" style="color:#fff; padding: 15px;"
+                  wx:if="{{purchase.orders[0].status==11}}">
+                拒绝原因：“{{purchase.orders[0].info}}”，如需继续采购请修改
+            </view>
             <form bindsubmit="formSubmit" class="activity">
                 <input name="weight_unit" value="{{form.weight_unit}}" style="display: none;"/>
                 <input name="distribution" value="{{form.distribution}}" style="display: none;"/>
+                <view class="weui-cells__title">代购设置</view>
                 <view class="weui-cells weui-cells_after-title">
                     <view class="weui-cell">
                         <view style="display: flex;flex-direction: row;width: 40%;">
@@ -311,8 +316,10 @@
                 url:URI.purchaseMyOrderSet,
                 data:data,
             }
+            let that = this;
             wepy.request(params).then(function (res) {
                 console.log('purchaseMyOrderSet：', res)
+                that.setActivityOrderData(res);
             });
         }
         async chooseAddress() {

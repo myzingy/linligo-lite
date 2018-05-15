@@ -122,7 +122,7 @@
                 </view>
 
                 <view class="weui-panel__ft" wx:if="{{purchase.itemsCount>0}}">
-                    <navigator url="./orderList?act_id={{purchase.id}}" wx:if="{{hasShare}}">
+                    <navigator url="./orderList?act_id={{purchase.id}}&act_status={{purchase.status}}" wx:if="{{hasShare}}">
                         <view class="weui-cell weui-cell_access weui-cell_link">
                             <view class="weui-cell__bd color-red" wx:if="{{purchase.status==2}}">
                                 已采购完成，请进入派发
@@ -145,7 +145,7 @@
                         </view>
                     </view>
 
-                    <view class="weui-cell" wx:if="{{hasShare}}">
+                    <view class="weui-cell" wx:if="{{hasShare && purchase.status>0}}">
                         <button type="primary" @tap="startPurchase">
                             {{purchase.status==1?'正在采购，点击进入'
                             :(purchase.status==0?'到市场了，开始采购':'查看采购清单')}}
@@ -176,7 +176,7 @@
             stime:"",
             etime:"",
             status:"",
-            id:29,
+            id:31,
             hasPhone:"",
             hasShare:false,
         }
@@ -319,18 +319,21 @@
                 this.navigateToOrder();
             },
             startPurchase(){
-                let params={
-                    url:URI.activityPurchase, //自己服务器维护用户登录状态地址
-                    data:{
-                        act_id:this.purchase.id
-                    },
-                }
-                wepy.request(params).then(function(res){
-                    console.log('startPurchase',res);
-                    wepy.navigateTo({
-                        url: './details?act_id='+res.act_id
-                    })
-                });
+//                let params={
+//                    url:URI.activityPurchase, //自己服务器维护用户登录状态地址
+//                    data:{
+//                        act_id:this.purchase.id
+//                    },
+//                }
+//                wepy.request(params).then(function(res){
+//                    console.log('startPurchase',res);
+//                    wepy.navigateTo({
+//                        url: './details?act_id='+res.act_id
+//                    })
+//                });
+                wepy.navigateTo({
+                    url: './details?act_id='+this.id
+                })
             }
         }
     }
