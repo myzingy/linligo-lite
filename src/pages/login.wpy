@@ -1,0 +1,105 @@
+<style lang="less">
+    @vheiget:200rpx;
+    @vheiget2:100rpx;
+    .avatar{
+        width: @vheiget;
+        height:@vheiget;
+        margin: 0 auto;
+
+        border-radius: @vheiget2;
+        overflow: hidden;
+        image{
+            width: @vheiget;
+            height:@vheiget;
+        }
+    }
+    .avatar-right{
+        margin-right: 20rpx;
+    }
+    .avatar-left{
+        margin-left: 20rpx;
+    }
+    .jia{
+        line-height: @vheiget;
+        font-size: @vheiget2*2;
+    }
+</style>
+<template>
+    <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
+        <view class="weui-msg" >
+            <view class="weui-msg__icon-area">
+                <view class="weui-flex">
+                    <view class="weui-flex__item">
+                        <view class="avatar avatar-right">
+                            <open-data type="userAvatarUrl"></open-data>
+                        </view>
+                    </view>
+                    <view class="jia color-green">
+                        ☍
+                    </view>
+                    <view class="weui-flex__item">
+                        <view class="avatar avatar-left">
+                            <image src="http://009-img.vking.wang/logo144x144.jpg"></image>
+                        </view>
+                    </view>
+                </view>
+
+
+            </view>
+            <view class="weui-msg__text-area">
+                <view class="weui-msg__title">邻里逛市场</view>
+                <view class="weui-msg__desc">为了更好的服务邻里，邻里逛市场 需要你授权登录</view>
+            </view>
+            <view class="weui-msg__opr-area">
+                <view class="weui-btn-area">
+                    <button wx:if="{{canIUse}}" open-type="getUserInfo"
+                            class="bg-color-green" style="color:#fff;"
+                            bindgetuserinfo="bindGetUserInfo">
+                        授权登录
+                    </button>
+                    <view wx:else class="color-red" style="font-size: 300%;">请升级微信</view>
+                </view>
+            </view>
+            <view class="weui-msg__extra-area">
+                <view class="weui-footer">
+                    <view class="weui-footer__text">邻里逛市场 © 2018</view>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+<script>
+    import wepy from 'wepy'
+    import URI from '../util/uri'
+    export default class Login extends wepy.page {
+        config = {
+            navigationBarTitleText: '邻里逛市场'
+        }
+        components = {
+        }
+        data = {
+            userInfo:null,
+            canIUse: wx.canIUse('button.open-type.getUserInfo')
+        }
+        onLoad(option) {
+
+        }
+        onShow(){
+
+        }
+
+        methods = {
+            bindGetUserInfo(e) {
+                console.log('login-bindGetUserInfo',e.detail);
+                if(e.detail.errMsg=='getUserInfo:ok'){
+                    this.$parent.serLogin().then((res)=>{
+                        console.log('this.$parent.serLogin() then',res)
+                        wepy.navigateBack();
+                    }).catch((res)=>{
+                        console.log('this.$parent.serLogin() fail',res)
+                    })
+                }
+            }
+        }
+    }
+</script>

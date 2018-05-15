@@ -19,11 +19,13 @@
                 <view class="weui-cells weui-cells_after-title">
                     <view class="weui-cell weui-cell_access">
                         <view class="weui-cell__bd color-red">{{stime}} 前往 {{purchase.goto}}，大约 {{etime}} 返回</view>
+                        <!--
                         <view class="weui-cell__ft weui-cell__ft_in-access" style="font-size: 0">
                             <navigator url="/pages/me/index">
                                 <view class="color-green" style="display: inline-block;vertical-align:middle; font-size: 28rpx;">个人<view>中心</view></view>
                             </navigator>
                         </view>
+                        -->
                     </view>
                 </view>
                 <view class="weui-panel__bd">
@@ -175,7 +177,13 @@
             if(typeof option.id!='undefined'){
                 this.id=option.id;
             }
-            wepy.setStorageSync('params',option);
+            if(typeof option.share_openid!='undefined'){
+                wepy.setStorage({
+                    key:'share_openid',
+                    data:option.share_openid
+                });
+            }
+            //wepy.setStorageSync('params',option);
         }
         onShow() {
             console.log('info-onShow',arguments);
@@ -184,7 +192,6 @@
                 this.hasPhone=this.$parent.globalData.phone;
                 this.userInfo=this.$parent.globalData.userInfo;
             }
-            this.$parent.bindShareOpenid();
             this.getActivity(this.id);
         }
         onShareAppMessage() {
@@ -197,7 +204,7 @@
             if(this.hasShare){
                 return {
                     title: this.purchase.slogan,
-                    path: '/pages/purchase?id='+this.id+'&share_openid='+this.userInfo.openId,
+                    path: '/pages/purchase/info?id='+this.id+'&share_openid='+this.userInfo.openId,
                     success: function(res) {
                         // 转发成功
                     },

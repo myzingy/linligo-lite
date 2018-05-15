@@ -193,10 +193,10 @@
             }
         }
         onLoad(option) {
+            console.log('index-onLoad',option);
             this.userInfo=this.$parent.globalData.userInfo;
             this.hasPhone=this.$parent.globalData.phone;
             if(typeof option.share_openid!='undefined'){
-                this.share_openid=option.share_openid;
                 wepy.setStorage({
                     key:'share_openid',
                     data:option.share_openid
@@ -209,7 +209,7 @@
                 this.hasPhone=this.$parent.globalData.phone;
                 this.userInfo=this.$parent.globalData.userInfo;
             }
-            this.$parent.bindShareOpenid();
+
         }
         navigateToNew(){
             wepy.navigateTo({

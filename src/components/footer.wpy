@@ -21,5 +21,12 @@
 
         events = {};
 // Other properties
+        onLoad(option){
+            console.log('footer-onLoad',option);
+            //this.$parent.$parent.checkLoginState();
+            //this.$parent.$parent.getStorageInit();
+            this.$parent.$parent.checkSerLogin();
+            this.$parent.$parent.bindShareOpenid();
+        }
     }
 </script>

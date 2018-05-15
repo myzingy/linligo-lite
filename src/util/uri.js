@@ -1,10 +1,14 @@
 export default {
     isProduction:function(){
+        let flag=process.env.NODE_ENV != 'dev';
+        if(flag){
+            //console.log=function(){};
+        }
         console.log('process.env.NODE_ENV',process.env.NODE_ENV);
-        return process.env.NODE_ENV != 'dev';
+        return flag
     },
     cgi:function(uri="",data={}){
-        var base_url=this.isProduction()?"https://vking.wang/api":"http://www.linligo.com/api";
+        var base_url=this.isProduction()?"https://009.vking.wang/api":"http://www.linligo.com/api";
         if(typeof uri =='string') return base_url.replace('api','')+uri;
         base_url+='/'+uri.act;
         console.log('isProduction',this.isProduction(),base_url);
@@ -19,7 +23,7 @@ export default {
     },
     user:{act:'wxuser',code:'10000',type:'GET',timeout:0},
     refreshToken:{act:'wxuser/refreshToken',code:'10001',type:'POST',timeout:0},
-    miniLogin:{act:'wxuser/miniLogin',code:'10002',type:'GET',timeout:0,silence:true},
+    miniLogin:{act:'wxuser/miniLogin',code:'10002',type:'POST',timeout:0,silence:false},
     setPhoneNumber:{act:'wxuser/setPhoneNumber',code:'10003',type:'POST',timeout:0,silence:false},
     setShareOpenid:{act:'wxuser/setShareOpenid',code:'10004',type:'POST',timeout:0,silence:true},
 
