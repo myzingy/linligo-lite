@@ -24,7 +24,7 @@
                   wx:if="{{purchase.orders[0].status==11}}">
                 拒绝原因：“{{purchase.orders[0].info}}”，如需继续采购请修改
             </view>
-            <form bindsubmit="formSubmit" class="activity">
+            <form bindsubmit="formSubmit" class="activity" report-submit="true">
                 <input name="weight_unit" value="{{form.weight_unit}}" style="display: none;"/>
                 <input name="distribution" value="{{form.distribution}}" style="display: none;"/>
                 <view class="weui-cells__title">代购设置</view>
@@ -41,15 +41,17 @@
                         </view>
                         <view style="display: flex;flex-direction: row;width: 35%;">
                             <view style="width:100rpx; line-height: 30px;" class="color-red">佣金:</view>
-                            <input name="commission" placeholder="输入佣金" style="width: 30px;border-bottom: 1px solid #ccc;"
-                                   value="{{form.commission}}" bindchange="apply" data-formkey="commission"/>
+                            <input name="commission" placeholder="输入佣金" type="digit"
+                                   style="width: 30px;border-bottom: 1px solid #ccc;"
+                                   value="{{form.commission}}" bindchange="apply"
+                                   data-formkey="commission"/>
                             <view style="line-height: 30px;">元</view>
                         </view>
                         <view style="width: 25%;">
                             <button class="weui-btn mini-btn" type="primary"
                                     wx:if="{{purchase.status==0}}"
                                     formType="submit" data-formkey="orderSetting">
-                                设置
+                                保存
                             </button>
                         </view>
                     </view>
@@ -72,9 +74,10 @@
 
                     <view class="weui-cell weui-cell_input">
                         <view class="weui-cell__bd">
-                            <slider name="weight" min="0.5" max="10" step="0.5"
-                                    bindchange="apply" data-formkey="weight"
-                                    show-value value="{{form.weight}}"/>
+                            <input name="weight" placeholder="输入数量/重量" type="digit"
+                                   style="border-bottom: 1px solid #ccc;"
+                                   value="{{form.weight}}" bindchange="apply"
+                                   data-formkey="weight"/>
                         </view>
                         <view class="weui-cell__hd">
                             <view class="weui-label">
@@ -85,7 +88,7 @@
                                               style="line-height: 16rpx;height: 36rpx; padding-top: 0; margin-right: 10rpx;" >
                                             {{form.weight_unit}}
                                         </text>
-                                        <text class="weui-cell_link">切换</text>
+                                        <text class="weui-cell_link">切换单位</text>
                                     </view>
                                 </picker>
                             </view>
@@ -105,16 +108,17 @@
             </form>
             <view class="weui-panel weui-panel_access" wx:if="{{purchase.orders[0].items.length>0}}">
                 <view class="weui-cells__title">采购列表</view>
-                <view class="weui-cells weui-cells_after-title" wx:for="{{purchase.orders[0].items}}" wx:key="key">
-                    <view class="weui-cell">
-                        <view class="weui-cell__bd">{{item.name}} ({{item.weight/10}}{{item.weight_unit}})</view>
-                        <view class="weui-cell__ft">
-                            <button class="weui-btn mini-btn" type="default"
-                                    wx:if="{{purchase.status==0}}"
-                                    data-item-id="{{item.id}}" @tap="removeItem">
+                <view class="weui-cell weui-cell_access weui-cell_link"
+                      wx:for="{{purchase.orders[0].items}}" wx:key="item-key">
+                    <view class="weui-cell__bd">{{item.name}} （{{item.weight/10}} {{item.weight_unit}}）</view>
+                    <view class="weui-cell__ft">
+                        <form bindsubmit="removeItem" report-submit="true"
+                              data-item-id="{{item.id}}"
+                              wx:if="{{purchase.status==0}}">
+                            <button class="weui-btn mini-btn" type="default" form-type="submit">
                                 取消
                             </button>
-                        </view>
+                        </form>
                     </view>
                 </view>
             </view>
@@ -136,7 +140,7 @@
             footer:footer,
         }
         data = {
-            act_id:23,
+            act_id:25,
             purchase:null,
             address:null,
             unitsRange:daa.units,
@@ -144,7 +148,7 @@
             form:{
                 unitIndex: 0,
                 weight_unit: daa.units[0],
-                weight:0.5,
+                weight:"",
                 name:"",
                 distributionIndex:-1,
                 distribution:"",
@@ -169,7 +173,8 @@
                     required: true
                 },
                 weight: {
-                    required: true
+                    required: true,
+                    min:0.5
                 },
                 weight_unit: {
                     required: true
@@ -190,7 +195,8 @@
                     required: '请填写商品名称'
                 },
                 weight: {
-                    required: '请填写数量'
+                    required: '请填写数量',
+                    min:'最小值为0.5'
                 },
                 weight_unit: {
                     required: '请填写数量单位'
@@ -252,7 +258,7 @@
                 that.form.distribution=res.orders[0].distribution;
             }
             that.form.name="";
-            that.form.weight=0.5;
+            that.form.weight="";
             that.$apply();
         }
         async getItemName(name){
@@ -349,6 +355,7 @@
                 this.$apply();
             },
             formSubmit(e){
+                this.$parent.formIds(e);
                 console.log('formSubmit：', e,e.detail.target.dataset.formkey)
                 let formkey = e.detail.target.dataset.formkey;
                 if(formkey=='orderSetting'){
@@ -375,7 +382,8 @@
                 });
             },
             removeItem(e){
-                console.log(e)
+                console.log('removeItem',e)
+                this.$parent.formIds(e);
                 let params={
                     url:URI.purchaseMyOrderDel,
                     data:{

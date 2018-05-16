@@ -53,11 +53,11 @@
     export default class extends wepy.app {
         config = {
             pages: [
+                'pages/purchase/order',
                 'pages/index',
                 'pages/login',
 
                 'pages/purchase/info',
-                'pages/purchase/order',
                 'pages/purchase/new',
                 'pages/purchase/details',
                 'pages/purchase/orderList',
@@ -105,10 +105,12 @@
                     p.url=URI.cgi(p.url,p.data);
 
                     let  Bearer = wx.getStorageSync('access_token')
+                    let  formIds = this.formIds();
                     p.header= {
                         'Authorization': Bearer ? ('Bearer ' + Bearer) : '',
                         'Accept': 'application/json',
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'formIds':JSON.stringify(formIds)
                     }
                     console.log('config request: ', p.url,p.data);
                     // 必须返回OBJECT参数对象，否则无法发送请求到服务端
@@ -307,6 +309,22 @@
                     }
                 });
             });
+        }
+        formIds(e){
+            if(!e) return wepy.getStorageSync('formIds');
+            if(e=='clear' || e=='clean') return wepy.removeStorage({key:'formIds'});
+
+            //saves
+            let formId=e.detail.formId.replace(/[ ]/g,'');
+            if(formId){
+                let formIds=wepy.getStorageSync('formIds');
+                if(!formIds){
+                    formIds={};
+                }
+                formIds[formId]=Date.parse(new Date())/1000;
+                wepy.setStorage({key:'formIds',data:formIds});
+            }
+
         }
     }
 </script>
