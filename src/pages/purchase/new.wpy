@@ -5,7 +5,7 @@
     <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
         <view class="page__bd">
             <view class="weui-toptips weui-toptips_warn" wx:if="{{showTopTips}}">{{showTopTipsMsg}}</view>
-            <form bindsubmit="formSubmit" class="activity">
+            <form bindsubmit="formSubmit" class="activity" report-submit="true">
                 <view class="weui-cells weui-cells_after-title">
                     <view class="weui-cell weui-cell_input">
                         <view class="weui-cell__hd">
@@ -371,6 +371,7 @@
             },
             formSubmit(e){
                 console.log('formSubmit：', e.detail.value)
+                this.$parent.formIds(e);
                 wepy.setStorageSync('purchase-form', e.detail.value);
 
                 if (!this.WxValidate.checkForm(e)) {

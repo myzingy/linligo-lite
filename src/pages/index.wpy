@@ -78,16 +78,23 @@
                         </view>
                     </view>
                 </view>
-                <navigator url="/pages/me/index">
+                <form bindsubmit="formSubmit" report-submit="true">
+
                 <view class="weui-panel__ft">
                     <view class="weui-cell weui-cell_access weui-cell_link">
-                        <view class="weui-cell__bd">分享得红包，可用于抵扣菜钱哦</view>
+                        <view class="weui-cell__bd">
+                            <button data-url="/pages/me/index" class="txt-btn" formType="submit">
+                            分享得红包，可用于抵扣菜钱哦
+                            </button>
+                        </view>
                         <view class="weui-cell__ft weui-cell__ft_in-access">
+                            <button data-url="/pages/me/index" class="txt-btn" formType="submit">
                             <view class="weui-badge" style="margin-left: 5px;">个人中心</view>
+                            </button>
                         </view>
                     </view>
                 </view>
-                </navigator>
+                </form>
             </view>
 
             <view class="weui-panel weui-panel_access">
@@ -239,6 +246,16 @@
                     that.navigateToNew();
                 });
             },
+            formSubmit(e){
+                console.log('formSubmit',e);
+                this.$parent.formIds(e);
+                let url=e.detail.target.dataset.url;
+                if(url){
+                    wepy.navigateTo({
+                        url:url
+                    });
+                }
+            }
         }
     }
 </script>

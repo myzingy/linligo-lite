@@ -9,9 +9,11 @@
         <view class="page__bd">
             <view class="weui-panel">
                 <view class="weui-panel__hd">采购活动-{{type==1?'我发起的':'我参与的'}}</view>
+                <form bindsubmit="formSubmit" report-submit="true">
                 <view class="weui-panel__bd">
                         <view class="weui-media-box weui-media-box_text" wx:for="{{purchase}}" wx:key="key">
-                            <navigator url="../purchase/info?id={{item.id}}">
+                            <button class="txt-btn" data-url="../purchase/info?id={{item.id}}"
+                                    formType="submit">
                                 <view class="weui-media-box__title weui-media-box__title_in-text">{{item.slogan}}</view>
                                 <view class="weui-media-box__desc">
                                     <view>{{item.goto}}，{{item.stime}} 至 {{item.etime}}</view>
@@ -22,9 +24,10 @@
                                     <view class="weui-media-box__info__meta weui-media-box__info__meta_extra">佣金：{{item.commission}}元</view>
                                     <view class="weui-media-box__info__meta weui-media-box__info__meta_extra">{{item.distribution}}</view>
                                 </view>
-                            </navigator>
+                            </button>
                         </view>
                 </view>
+                </form>
             </view>
         </view>
     </view>
@@ -71,7 +74,16 @@
             });
         }
         methods = {
-
+            formSubmit(e){
+                console.log('formSubmit',e);
+                this.$parent.formIds(e);
+                let url=e.detail.target.dataset.url;
+                if(url){
+                    wepy.navigateTo({
+                        url:url
+                    });
+                }
+            }
         }
     }
 </script>

@@ -11,7 +11,18 @@
         color:#000000 !important;
         font-size:100% ;
         line-height: 100%;
-        border-color: #fff;
+
+        background: none !important;
+        border-radius: 100px !important;
+        border: none !important;
+        border-width: 0 !important;
+        border-color: #fff !important;
+        &:before{
+            border-top: 1rpx solid #d9d9d9;
+        }
+        &:after{
+            border: none !important;
+        }
     }
 </style>
 <template>
@@ -31,38 +42,53 @@
                     </view>
                 </view>
                 <view class="weui-form-preview__ft">
-                    <navigator class="weui-form-preview__btn weui-form-preview__btn_primary">
-                        收入（¥{{wxuser.user.money/100}}）
-                    </navigator>
-                    <navigator class="weui-form-preview__btn color-red">
-                        红包（¥{{wxuser.user.red_packet/100}}）
-                    </navigator>
+                    <view class="weui-form-preview__btn weui-form-preview__btn_primary">
+                        <form bindsubmit="formSubmit" report-submit="true">
+                            <button class="txt-btn" type="primary" formType="submit" style="line-height: 50px;text-align: center">
+                                    收入（¥{{wxuser.user.money/100}}）
+                            </button>
+                        </form>
+                    </view>
+                    <view class="weui-form-preview__btn color-red">
+                        <form bindsubmit="formSubmit" report-submit="true">
+                            <button class="txt-btn" type="primary" formType="submit" style="line-height: 50px;text-align: center">
+                                红包（¥{{wxuser.user.red_packet/100}}）
+                            </button>
+                        </form>
+                    </view>
                 </view>
             </view>
 
             <view class="weui-panel">
+                <form bindsubmit="formSubmit" report-submit="true">
                 <view class="weui-panel__hd">采购活动</view>
                 <view class="weui-panel__bd">
                     <view class="weui-media-box weui-media-box_small-appmsg">
                         <view class="weui-cells weui-cells_in-small-appmsg">
-                            <navigator url="./purchase?type=1" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
-                                <view class="weui-cell__hd" style="line-height: 20rpx;margin-right: 10rpx;">
-                                    <icon type="success" size="20"></icon>
-                                </view>
-                                <view class="weui-cell__bd weui-cell_primary">
-                                    <view>我发起的</view>
-                                </view>
-                                <view class="weui-cell__ft weui-cell__ft_in-access"></view>
-                            </navigator>
-                            <navigator url="./purchase?type=2" class="weui-cell weui-cell_access" hover-class="weui-cell_active">
-                                <view class="weui-cell__hd" style="line-height: 20rpx;margin-right: 10rpx;">
-                                    <icon type="info" size="20"></icon>
-                                </view>
-                                <view class="weui-cell__bd weui-cell_primary">
-                                    <view>我参与的</view>
-                                </view>
-                                <view class="weui-cell__ft weui-cell__ft_in-access"></view>
-                            </navigator>
+
+                                <button data-url="./purchase?type=1"
+                                        formType="submit"
+                                        class="weui-cell weui-cell_access new-activity" hover-class="weui-cell_active">
+                                    <view class="weui-cell__hd" style="line-height: 20rpx;margin-right: 10rpx;">
+                                        <icon type="success" size="20"></icon>
+                                    </view>
+                                    <view class="weui-cell__bd weui-cell_primary">
+                                        <view>我发起的</view>
+                                    </view>
+                                    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                                </button>
+                                <button data-url="./purchase?type=2"
+                                        formType="submit"
+                                        class="weui-cell weui-cell_access new-activity" hover-class="weui-cell_active">
+                                    <view class="weui-cell__hd" style="line-height: 20rpx;margin-right: 10rpx;">
+                                        <icon type="info" size="20"></icon>
+                                    </view>
+                                    <view class="weui-cell__bd weui-cell_primary">
+                                        <view>我参与的</view>
+                                    </view>
+                                    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                                </button>
+
                             <button type="warn" open-type="getPhoneNumber"
                                     bindgetphonenumber="handlerNewActivity"
                                     class="weui-cell weui-cell_access new-activity"
@@ -88,15 +114,18 @@
                         </view>
                     </view>
                 </view>
+                </form>
             </view>
 
             <view class="weui-panel">
+                <form bindsubmit="formSubmit" report-submit="true">
                 <view class="weui-panel__bd">
                     <view class="weui-media-box weui-media-box_small-appmsg">
                         <view class="weui-cells weui-cells_in-small-appmsg">
-                            <navigator url="/pages/index"
-                                       open-type="redirect"
-                                       class="weui-cell weui-cell_access" hover-class="weui-cell_active">
+                            <button data-url="/pages/index"
+                                    data-type="redirectTo"
+                                    formType="submit"
+                                    class="weui-cell weui-cell_access new-activity" hover-class="weui-cell_active">
                                 <view class="weui-cell__hd" style="line-height: 20rpx;margin-right: 10rpx;">
                                     <icon type="success_no_circle" size="20" class="color-red"></icon>
                                 </view>
@@ -104,10 +133,11 @@
                                     <view>分享首页赢红包</view>
                                 </view>
                                 <view class="weui-cell__ft weui-cell__ft_in-access"></view>
-                            </navigator>
+                            </button>
                         </view>
                     </view>
                 </view>
+                </form>
             </view>
         </view>
     </view>
@@ -188,6 +218,23 @@
                     that.navigateToNew();
                 });
             },
+            formSubmit(e){
+                console.log('formSubmit',e);
+                this.$parent.formIds(e);
+                let url=e.detail.target.dataset.url;
+                if(url){
+                    let type=e.detail.target.dataset.type;
+                    if(type=='redirectTo'){
+                        wepy.redirectTo({
+                            url:url
+                        });
+                    }else{
+                        wepy.navigateTo({
+                            url:url
+                        });
+                    }
+                }
+            }
         }
     }
 </script>
