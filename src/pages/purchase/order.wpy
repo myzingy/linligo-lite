@@ -55,6 +55,20 @@
                             </button>
                         </view>
                     </view>
+                    <view wx:if="{{purchase.status==2 && '来我家取'==purchase.orders[0].distribution}}"
+                          style="margin-top: 0; font-size: 38rpx;"
+                          class="weui-panel weui-panel__hd color-green">
+                        <view>姓名：{{purchase.address.userName}}</view>
+                        <view data-phone="{{purchase.address.telNumber}}" @tap="callPhone">
+                            电话：{{purchase.address.telNumber}}
+                        </view>
+                        <view>地址：{{purchase.address.detailInfo}}</view>
+                        <view class="color-black-light"
+                              data-phone="{{purchase.wxuser.phone}}" @tap="callPhone"
+                              style="font-size: 70%;float: right;">
+                            备用电话：{{purchase.wxuser.phone}}
+                        </view>
+                    </view>
                 </view>
                 <view class="weui-cells__title" wx:if="{{purchase.status==0}}">采购信息</view>
                 <view class="weui-cells weui-cells_after-title" wx:if="{{purchase.status==0}}">
@@ -140,7 +154,7 @@
             footer:footer,
         }
         data = {
-            act_id:25,
+            act_id:32,
             purchase:null,
             address:null,
             unitsRange:daa.units,
@@ -347,6 +361,22 @@
                 });
             })
         }
+        _callPhone(e){
+            let phone = e.target.dataset.phone.replace(/[^\d]/g,'');
+            wepy.makePhoneCall({
+                phoneNumber: phone
+            }).then(()=>{
+                console.log("拨打电话成功！")
+            }).catch((e)=>{
+                console.log("拨打电话失败！",e)
+                if(e.errMsg=='makePhoneCall:fail cancel') return;
+                wepy.showToast({
+                    title: '拨打电话失败！请手动尝试',
+                    icon:'none',
+                    duration: 2000
+                })
+            })
+        }
         methods = {
 
             apply(e){
@@ -402,7 +432,11 @@
                     console.log('purchaseMyOrderSet：', res)
                     that.setActivityOrderData(res);
                 });
-            }
+            },
+            callPhone(e){
+                console.log('callPhone', e);
+                this._callPhone(e);
+            },
         }
     }
 

@@ -42,7 +42,17 @@
         margin-right: 5px;
         line-height: inherit;
     }
-
+    .txt-btn{
+        color: inherit !important;
+        border: none !important;
+        background-color: transparent !important;
+        text-align: left;
+        padding: 0;
+        margin: 0;
+        position: inherit;
+        font-size: 100%;
+        line-height: 100%;
+    }
 </style>
 
 <script>
@@ -53,11 +63,11 @@
     export default class extends wepy.app {
         config = {
             pages: [
-                'pages/purchase/info',
                 'pages/purchase/order',
                 'pages/index',
                 'pages/login',
 
+                'pages/purchase/info',
                 'pages/purchase/new',
                 'pages/purchase/details',
                 'pages/purchase/orderList',
