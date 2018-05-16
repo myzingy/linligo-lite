@@ -60,7 +60,7 @@
                         <view class="weui-form-preview__label">配送方式</view>
                         <view class="weui-form-preview__value">
                             <view class="weui-badge bg-color-blue" style="margin-left: 5px;"
-                                    wx:for="{{purchase.distribution}}" wx:key="value">{{item}}</view>
+                                    wx:for="{{purchase.distribution}}" wx:key="value">{{dist[item]}}</view>
                         </view>
                     </view>
                     <view class="weui-form-preview__item">
@@ -176,9 +176,10 @@
             stime:"",
             etime:"",
             status:"",
-            id:31,
+            id:32,
             hasPhone:"",
             hasShare:false,
+            dist:daa.dist,
         }
         onLoad(option) {
             this.hasPhone=this.$parent.globalData.phone;

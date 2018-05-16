@@ -158,6 +158,7 @@
             inputList:[],
             showTopTips:false,
             showTopTipsMsg:"出错了",
+            dist:daa.dist
         }
         onLoad(option) {
             //this.validateInit();
@@ -249,13 +250,19 @@
         }
         setActivityOrderData(res){
             let that=this;
+            let distribution=res.distribution;
+            for(let x in distribution){
+                distribution[x]=that.dist[distribution[x]];
+            }
+            res.distribution=distribution;
+
             that.purchase=res;
             that.form.commission=res.commission;
             if(res.orders.length>0){
                 that.form.commission=res.orders[0].commission;
                 that.form.distributionIndex=res.distribution.indexOf(res.orders[0].distribution)
                 console.log('that.form.distributionIndex',that.form.distributionIndex);
-                that.form.distribution=res.orders[0].distribution;
+                that.form.distribution=that.dist[res.orders[0].distribution];
             }
             that.form.name="";
             that.form.weight="";
