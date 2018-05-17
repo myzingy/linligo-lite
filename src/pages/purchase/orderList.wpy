@@ -4,7 +4,9 @@
 <template>
     <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
         <view class="page__bd">
-            <view class="weui-panel weui-panel_access" wx:for="{{purchase}}" wx:key="key">
+            <view class="weui-panel weui-panel_access" wx:for="{{purchase}}"
+                  wx:for-index="orderIndex"
+                  wx:key="orderKey">
                 <view class="weui-panel__bd">
                     <view class="weui-media-box weui-media-box_appmsg">
                         <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
@@ -39,14 +41,55 @@
                     </view>
                 </view>
                 <view class="weui-panel__ft">
-                    <view class="weui-cell weui-cell_access weui-cell_link" wx:for="{{item.items}}" wx:key="item-key">
-                        <view class="weui-cell__bd">{{item.name}} （{{item.weight/10}} {{item.weight_unit}}）</view>
+                    <view class="weui-cell weui-cell_access weui-cell_link"
+                          wx:for="{{item.items}}"
+                          wx:for-index="itemIndex"
+                          wx:key="itemKey">
+                        <view class="weui-cell__bd" wx:if="{{item.status==12}}">
+                            {{item.name}}
+                            <view class="weui-badge bg-color-blue" style="margin-left: 5px;">
+                                {{item.weight/10}}{{item.weight_unit}}
+                            </view>
+                        </view>
+                        <view class="weui-cell__bd" wx:else="">
+                            {{item.name}}
+                            <view class="weui-badge bg-color-blue" style="margin-left: 5px;">
+                                {{item.weight/10}}{{item.weight_unit}}
+                            </view>
+                            <view class="weui-badge bg-color-green">
+                                {{item.price/100}} 元/斤
+                            </view>
+                        </view>
                         <!--<view class="weui-cell__ft weui-cell__ft_in-access"></view>-->
+                        <view class="weui-cell__ft" wx:if="{{item.status==2}}" style="width:60%">
+                            <view class="weui-cell weui-cell_input weui-cell_vcode">
+                                <view class="weui-cell__bd">
+                                    <input class="weui-input" placeholder="输入实际重量"
+                                           @input="actualWeightInput"
+                                           data-order-index="{{orderIndex}}"
+                                           data-item-index="{{itemIndex}}"
+                                           type="digit"
+                                           value="{{item.actual_weight>0?item.actual_weight:''}}" />
+                                </view>
+                                <view class="weui-cell__ft">
+                                    <button @tap="actualWeightUpdate"
+                                            data-order-index="{{orderIndex}}"
+                                            data-item-index="{{itemIndex}}"
+                                            style="margin-left: 5px; padding-left: 5px; padding-right: 5px;"
+                                            type="primary" size="mini">(斤)保存</button>
+                                </view>
+                            </view>
+                        </view>
+                        <view class="weui-cell__ft" wx:else="">
+                            <view class="weui-badge" style="margin-left: 5px;">
+                                {{status[item.status]}}
+                            </view>
+                        </view>
                     </view>
                     <view class="weui-cell weui-cell_input weui-cell_vcode">
                         <view class="weui-cell__hd bg-color-blue color-black-light"
-                              style="width: 140rpx; text-align: center; margin-right: 10rpx;">
-                            <view>{{status[item.status]}}</view>
+                              style="text-align: center; margin-right: 10rpx; padding: 5px 10px">
+                            <view>{{status[item.status]}}，{{item.totalPrice}}元</view>
                         </view>
                         <view class="weui-cell__bd">
                             <input class="weui-input"
@@ -65,6 +108,7 @@
                                 <button type="primary"
                                         @tap="activityOrdersSet"
                                         data-order-id="{{item.id}}"
+                                        data-order-index="{{orderIndex}}"
                                         data-order-status="4"
                                         wx:if="{{item.status==2}}">已派送</button>
                             </view>
@@ -96,7 +140,7 @@
         }
         data = {
             status:daa.activityStatus,
-            act_id:31,
+            act_id:34,
             act_status:0,
             purchase:null,
             refuseInfo:{},
@@ -118,8 +162,34 @@
             wepy.request(params).then((res) => {
                 console.log('purchase：', res);
                 this.purchase=res;
-                this.$apply();
+                this.totalPriceUpdate(true);
             });
+        }
+        totalPriceUpdate(falg=false){
+            let res=this.purchase;
+            for(let i in res){
+                let totalPriceUpdateAll=true;
+                let totalPrice=0;
+                if(res[i].items.length>0){
+                    for(let j in res[i].items){
+                        if(falg){
+                            res[i].items[j].actual_weight/=10;
+                        }
+                        let item=res[i].items[j];
+                        if(item.price>0){
+                            if(item.actual_weight>0){
+                                totalPrice+=item.price/100*item.actual_weight;
+                            }else{
+                                totalPriceUpdateAll=false;
+                            }
+                        }
+                    }
+                }
+                res[i].totalPrice=totalPrice.toFixed(2);
+                res[i].totalPriceUpdateAll=totalPriceUpdateAll;
+            }
+            this.purchase=res;
+            this.$apply();
         }
         methods = {
 
@@ -167,11 +237,22 @@
                         return;
                     }
                 }
+                if(status==4){
+                    let oi = e.target.dataset.orderIndex;
+                    if(!this.purchase[oi].totalPriceUpdateAll){
+                        wepy.showToast({
+                            title: '请填写实际重量',
+                            icon: 'none',
+                            duration: 3000
+                        });
+                        return;
+                    }
+                }
                 this.$parent.confirm('确认设置为 '+this.status[status]).then(ok=>{
                     wepy.request(params).then((res) => {
                         console.log('purchase：', res);
                         this.purchase=res;
-                        this.$apply();
+                        this.totalPriceUpdate(true);
                     });
                 });
 
@@ -199,6 +280,43 @@
                     });
                 });
 
+            },
+            actualWeightInput(e){
+                console.log('actualWeightUpdate',e);
+                let oi=e.target.dataset.orderIndex;
+                let ii=e.target.dataset.itemIndex;
+                if(parseFloat(e.detail.value)>0){
+                    this.purchase[oi].items[ii].actual_weight=e.detail.value;
+                }else{
+                    this.purchase[oi].items[ii].actual_weight="";
+                }
+                this.totalPriceUpdate();
+            },
+            actualWeightUpdate(e){
+                console.log('actualWeightUpdate',e);
+                let oi=e.target.dataset.orderIndex;
+                let ii=e.target.dataset.itemIndex;
+                let item=this.purchase[oi].items[ii];
+                let val=item.actual_weight;
+                if(val>0){
+                    let params={
+                        url:URI.activityItems,
+                        data:{
+                            item_id:item.id,
+                            actual_weight:val
+                        },
+                    }
+                    wepy.request(params).then((res)=>{
+                        console.log('actualWeightUpdate',res);
+                        this.totalPriceUpdate();
+                    });
+                }else{
+                    wepy.showToast({
+                        title: '重量必须大于0',
+                        icon: 'none',
+                        duration: 2000
+                    });
+                }
             }
         }
     }

@@ -51,10 +51,13 @@
         margin: 0;
         position: inherit;
         font-size: 100%;
-        line-height: 100%;
+        line-height: 150%;
         &:after,&:before{
             border: none !important;
         }
+    }
+    .weui-media-box__title{
+        white-space: inherit;
     }
 </style>
 
@@ -66,14 +69,14 @@
     export default class extends wepy.app {
         config = {
             pages: [
+                'pages/purchase/order',
                 'pages/index',
                 'pages/login',
 
+                'pages/purchase/orderList',
                 'pages/purchase/info',
                 'pages/purchase/new',
                 'pages/purchase/details',
-                'pages/purchase/orderList',
-                'pages/purchase/order',
 
                 'pages/me/index',
                 'pages/me/purchase',
@@ -335,7 +338,7 @@
 
             //saves
             let formId=e.detail.formId.replace(/[ ]/g,'');
-            if(formId){
+            if(formId && 'theformIdisamockone'!=formId){
                 let formIds=wepy.getStorageSync('formIds');
                 if(!formIds){
                     formIds={};

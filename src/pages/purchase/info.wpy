@@ -34,7 +34,9 @@
                             <image class="weui-media-box__thumb" src="{{purchase.wxuser.userinfo.avatarUrl}}" />
                         </view>
                         <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
-                            <view class="weui-media-box__title">{{purchase.slogan}}</view>
+                            <view class="weui-media-box__title">
+                                {{purchase.slogan}}
+                            </view>
                             <view class="weui-media-box__desc">
                                 <text class="color-blue">发起人：</text>{{purchase.wxuser.userinfo.nickName}}
                                 <view>{{purchase.city}}·{{purchase.region}}</view>
@@ -138,7 +140,7 @@
 
                     <view class="weui-cell weui-cell_access weui-cell_link" wx:else="">
                         <view class="weui-cell__bd color-red" wx:if="{{purchase.status==2}}">
-                            已采购完成，请进入派发
+                            已采购完成，共计 {{purchase.ordersCount}} 人参加， {{purchase.itemsCount}} 件商品
                         </view>
                         <view class="weui-cell__bd" wx:else="">
                             目前已有 {{purchase.ordersCount}} 人参加，共计 {{purchase.itemsCount}} 件商品

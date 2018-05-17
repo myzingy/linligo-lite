@@ -120,7 +120,8 @@
                     </view>
                 </view>
             </form>
-            <view class="weui-panel weui-panel_access" wx:if="{{purchase.orders[0].items.length>0}}">
+            <view class="weui-panel weui-panel_access"
+                  wx:if="{{purchase.orders[0].items.length>0 && purchase.status==0}}">
                 <view class="weui-cells__title">采购列表</view>
                 <view class="weui-cell weui-cell_access weui-cell_link"
                       wx:for="{{purchase.orders[0].items}}" wx:key="item-key">
@@ -133,6 +134,43 @@
                                 取消
                             </button>
                         </form>
+                    </view>
+                </view>
+                <view class="weui-cells__title">已自动保存，可以返回或关闭</view>
+            </view>
+            <view class="weui-panel weui-panel_access"
+                  wx:if="{{purchase.orders[0].items.length>0 && purchase.status>0}}">
+                <view class="weui-cells__title">采购列表</view>
+                <view class="weui-cell weui-cell_access weui-cell_link"
+                      wx:for="{{purchase.orders[0].items}}" wx:key="item-key">
+                    <view class="weui-cell__bd">
+                        {{item.name}}
+                        <view class="weui-badge bg-color-blue" style="margin-left: 5px;">
+                            {{item.weight/10}}{{item.weight_unit}}
+                            <text wx:if="{{item.actual_weight>0}}" class="weui-badge bg-color-green">
+                                <text>{{item.actual_weight/10}}斤</text>
+                            </text>
+                        </view>
+                        <view class="weui-badge bg-color-green"
+                              style="margin-left: 5px;">
+                            {{item.price/100}} 元/斤
+                        </view>
+                    </view>
+                    <view class="weui-cell__ft">
+                        <view class="weui-badge" style="margin-left: 5px;">
+                            {{status[item.status]}}
+                        </view>
+                    </view>
+                </view>
+                <view class="weui-cell weui-cell_access weui-cell_link">
+                    <view class="weui-cell__bd">
+
+                    </view>
+                    <view class="weui-cell__ft" wx:if="{{totalPrice>0}}">
+                        合计：{{totalPrice}} 元
+                    </view>
+                    <view class="weui-cell__ft" wx:else="">
+                        等待发起者核算总价
                     </view>
                 </view>
             </view>
@@ -154,7 +192,7 @@
             footer:footer,
         }
         data = {
-            act_id:32,
+            act_id:34,
             purchase:null,
             address:null,
             unitsRange:daa.units,
@@ -172,7 +210,9 @@
             inputList:[],
             showTopTips:false,
             showTopTipsMsg:"出错了",
-            dist:daa.dist
+            dist:daa.dist,
+            status:daa.activityStatus,
+            totalPrice:0,
         }
         onLoad(option) {
             //this.validateInit();
@@ -277,6 +317,16 @@
                 that.form.distributionIndex=res.distribution.indexOf(res.orders[0].distribution)
                 console.log('that.form.distributionIndex',that.form.distributionIndex);
                 that.form.distribution=that.dist[res.orders[0].distribution];
+                let totalPrice=0;
+                if(res.status>1 && res.status<5 && res.orders[0].items.length>0){
+                    for(let ti in res.orders[0].items){
+                        let item=res.orders[0].items[ti];
+                        if(item.price>0 && item.actual_weight>0){
+                            totalPrice+=(item.price/100)*(item.actual_weight/10);
+                        }
+                    }
+                    that.totalPrice=totalPrice.toFixed(2);
+                }
             }
             that.form.name="";
             that.form.weight="";
