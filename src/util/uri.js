@@ -26,6 +26,7 @@ export default {
     miniLogin:{act:'wxuser/miniLogin',code:'10002',type:'POST',timeout:0,silence:false},
     setPhoneNumber:{act:'wxuser/setPhoneNumber',code:'10003',type:'POST',timeout:0,silence:false},
     setShareOpenid:{act:'wxuser/setShareOpenid',code:'10004',type:'POST',timeout:0,silence:true},
+    updateGroupid:{act:'wxgroup',code:'10005',type:'POST',timeout:0,silence:true},
 
     purchaseCreate:{act:'activity',code:'11000',type:'POST',timeout:0},
     purchase:{act:'activity/{id}',code:'11001',type:'GET',timeout:0},

@@ -157,7 +157,10 @@
                         </view>
                     </view>
                     <view class="weui-cell__ft">
-                        <view class="weui-badge" style="margin-left: 5px;">
+                        <view wx:if="{{item.status==4}}">
+                            {{item.actual_weight*item.price/1000}} 元
+                        </view>
+                        <view class="weui-badge" style="margin-left: 5px;" wx:else="">
                             {{status[item.status]}}
                         </view>
                     </view>

@@ -65,7 +65,6 @@
     import wepy from 'wepy'
     import 'wepy-async-function'
     import URI from './util/uri'
-
     export default class extends wepy.app {
         config = {
             pages: [
@@ -131,7 +130,7 @@
                         'formIds':JSON.stringify(formIds),
                         'openid':openid,
                     }
-                    console.log('config request: ', p.url,p.data);
+                    console.log('config request: ', p);
                     // 必须返回OBJECT参数对象，否则无法发送请求到服务端
                     return p;
                 },
@@ -139,7 +138,7 @@
                 // 请求成功后的回调函数
                 success (p) {
                     // 可以在这里对收到的响应数据对象进行加工处理
-                    console.log('request success: ', p);
+                    //console.log('request success: ', p);
                     if(p.header.formIds=='clean'){
                         this.formIds('clean');
                     }
@@ -179,13 +178,14 @@
             });
         }
 
-        onLaunch() {
-            console.log('app-onLaunch',arguments);
+        onLaunch(launchRes) {
+            console.log('app-onLaunch',launchRes);
+            this.bindGroupid(launchRes,true);
             this.wxLogin();
             this.getStorageInit();
         }
-        onShow(){
-            console.log('app-onShow',arguments);
+        onShow(res){
+            console.log('app-onShow',res);
         }
         getStorageInit(){
             this.globalData.userInfo=wepy.getStorageSync('userinfo');
@@ -347,6 +347,46 @@
                 wepy.setStorage({key:'formIds',data:formIds});
             }
 
+        }
+        bindGroupid(launchRes,onlySave=false){
+            if(!launchRes || launchRes.scene!=1044){
+                launchRes=wepy.getStorageSync('launchRes');
+            }else{
+                if(onlySave){
+                    wepy.setStorage({key:'launchRes',data:{
+                        query:launchRes.query,
+                        shareTicket:launchRes.shareTicket,
+                        scene:launchRes.scene
+                    }});
+                    return;
+                }
+            }
+            if(!launchRes || launchRes.scene!=1044) return;
+
+            wepy.getShareInfo({
+                shareTicket: launchRes.shareTicket,
+            }).then(wres=>{
+                console.log('getShareInfo then',wres);
+                let share_openid=launchRes.query.share_openid;
+                let act_id=launchRes.query.id;
+                let params={
+                    url:URI.updateGroupid,
+                    data:{
+                        share_openid:share_openid,
+                        act_id:act_id,
+                        share_res:wres
+                    }
+                }
+                wepy.request(params).then(hres => {
+                    console.log('updateGroupid then',hres);
+                    launchRes.scene=-4401;
+                    wepy.setStorage({key:'launchRes',data:launchRes});
+                }).catch(hres=>{
+                    console.log('updateGroupid fail',hres);
+                });
+            }).catch(wres=>{
+                console.log('getShareInfo fail',wres);
+            })
         }
     }
 </script>

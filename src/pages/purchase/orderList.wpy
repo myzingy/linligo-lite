@@ -55,6 +55,9 @@
                             {{item.name}}
                             <view class="weui-badge bg-color-blue" style="margin-left: 5px;">
                                 {{item.weight/10}}{{item.weight_unit}}
+                                <text wx:if="{{item.actual_weight>0}}" class="weui-badge bg-color-green">
+                                    <text>{{item.actual_weight}}斤</text>
+                                </text>
                             </view>
                             <view class="weui-badge bg-color-green">
                                 {{item.price/100}} 元/斤
@@ -81,7 +84,10 @@
                             </view>
                         </view>
                         <view class="weui-cell__ft" wx:else="">
-                            <view class="weui-badge" style="margin-left: 5px;">
+                            <view wx:if="{{item.status==4}}">
+                                {{item.actual_weight*item.price/100}} 元
+                            </view>
+                            <view class="weui-badge" style="margin-left: 5px;" wx:else="">
                                 {{status[item.status]}}
                             </view>
                         </view>

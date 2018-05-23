@@ -27,6 +27,7 @@
             //this.$parent.$parent.getStorageInit();
             this.$parent.$parent.checkSerLogin();
             this.$parent.$parent.bindShareOpenid();
+            this.$parent.$parent.bindGroupid();
         }
     }
 </script>

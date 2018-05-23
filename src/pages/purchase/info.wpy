@@ -197,6 +197,9 @@
                 });
             }
             //wepy.setStorageSync('params',option);
+            wx.showShareMenu({
+                withShareTicket: true
+            })
         }
         onShow() {
             console.log('info-onShow',arguments);
@@ -216,6 +219,7 @@
             console.log('onShareAppMessage',this.userInfo);
             if(this.hasShare){
                 return {
+                    withShareTicket:true,
                     title: this.purchase.slogan,
                     path: '/pages/purchase/info?id='+this.id+'&share_openid='+this.userInfo.openId,
                     success: function(res) {
@@ -227,6 +231,7 @@
                 }
             }
             return {
+                withShareTicket:true,
                 title: '邻里逛市场',
                 path: '/pages/index?share_openid='+this.userInfo.openId,
                 success: function(res) {
