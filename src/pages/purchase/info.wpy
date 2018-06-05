@@ -154,6 +154,13 @@
                         </button>
                     </view>
                 </view>
+                <view class="weui-panel__ft" wx:if="{{hasShare && purchase.status==0}}">
+                    <view class="weui-cell__bd">
+                        <button type="primary" open-type="share" class="bg-color-kuaixiao">
+                            点此分享到微信群，让大家参与吧！
+                        </button>
+                    </view>
+                </view>
 
             </view>
         </view>
@@ -178,7 +185,7 @@
             stime:"",
             etime:"",
             status:"",
-            id:32,
+            id:6,
             hasPhone:"",
             hasShare:false,
             dist:daa.dist,
