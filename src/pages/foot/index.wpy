@@ -1,0 +1,230 @@
+<style lang="less"></style>
+<template>
+    <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
+        <view class="page__bd" style="margin-top: 10px;">
+            <ecCanvas :ec.sync="ec" id="mychart-dom-save"></ecCanvas>
+            <view class="weui-panel weui-panel_access" style="padding: 10px;">
+                <button type="warn" @tap="saveLocalImg" wx:if="{{optionData.length>0}}" >保存图片</button>
+                <button type="warn" @tap="navigatorCreate">开 吃</button>
+            </view>
+        </view>
+    </view>
+    <footer></footer>
+</template>
+<script>
+    import wepy from 'wepy'
+    import URI from '../../util/uri'
+    import footer from '../../components/footer';
+    import echarts from '../../util/ec-canvas/echarts'
+    import ecCanvas from '../../components/ecCanvas'
+    import chinaMap from './china';
+    let chart;
+    function initChart(canvas, width, height) {
+        chart = echarts.init(canvas, null, {
+            width: width,
+            height: height
+        });
+        console.log('width, height',arguments)
+        canvas.setChart(chart);
+
+        echarts.registerMap('china', chinaMap);
+        const option = {
+            backgroundColor: '#f8f8f8',
+            title: {
+                text: '既然走不过人家，\n\n咱就吃他个五湖四海',
+                left: 'center',
+            },
+            visualMap: {
+                show: false,
+                type:'piecewise',
+                pieces:[],
+                showLabel:false,
+                left: 'right',
+                top: 'bottom',
+                text: ['高    (元/平方公里)', '低    (元/平方公里)'], // 文本，默认为数值文本
+                calculable: true,
+                inRange: {
+                     color: ['#fff9ce', '#ffe420'] // 浅蓝
+
+                }
+            },
+            series: [{
+                type: 'map',
+                mapType: 'china',
+                label: {
+                    normal: {
+                        show: false
+                    },
+                    emphasis: {
+                        textStyle: {
+                            color: '#fff'
+                        }
+                    }
+                },
+                itemStyle: {
+
+                    normal: {
+                        borderColor: '#ffe420',
+                        areaColor: '#F8F8F8',
+                    },
+                    emphasis: {
+                        areaColor: '#389BB7',
+                        borderWidth: 0
+                    }
+                },
+                animation: false,
+                data: [
+
+                ]
+
+            }],
+
+        };
+
+        chart.setOption(option);
+        return chart;
+    }
+    export default class FootIndex extends wepy.page {
+
+        config = {
+            navigationBarTitleText: '邻里逛市场',
+            usingComponents: {
+                //ecCanvas: ecCanvas,
+                "ec-canvas": "../../util/ec-canvas/ec-canvas"
+            }
+        }
+        components = {
+            footer: footer,
+            ecCanvas:ecCanvas,
+        }
+        data = {
+            ec: {
+                lazyLoad: true,
+                onInit: initChart
+            },
+            openid:'',
+            optionData:[],
+            chart:null,
+        }
+        setChartOption() {
+            let ll=this.optionData.length;
+            if(ll<1) return;
+            let lm=0;
+            this.optionData.forEach(px=>{
+                if(px.value>=80){
+                    lm+=1;
+                }
+            });
+            let title_text='吃遍了'+ll+'个省，\n\n你还年轻，努力加油吧'
+            if(lm>0){
+                title_text='吃遍了'+ll+'个省，\n\n被你吃垮了'+lm+'个省'
+            }
+            const option = {
+                backgroundColor: '#f8f8f8',
+                title: {
+                    text: title_text,
+                    left: 'center',
+                },
+                visualMap: {
+                    show: false,
+                    type:'piecewise',
+                    pieces:[
+                        {min: 100},
+                        {min: 90,max:100},
+                        {min: 80,max:90},
+                        {min: 70,max:80},
+                        {min: 60,max:70},
+                        {min: 50,max:60},
+                        {min: 40,max:50},
+                        {min: 40,max:50},
+                        {min: 30,max:40},
+                        {min: 20,max:30},
+                        {min: 10,max:20},
+                        {max:10},
+                    ],
+                    showLabel:false,
+                    left: 'right',
+                    top: 'bottom',
+                    text: ['高    (元/平方公里)', '低    (元/平方公里)'], // 文本，默认为数值文本
+                    calculable: true,
+                    inRange: {
+                        color: ['#fff9ce', '#ff0000'] //
+                    }
+                },
+                series: [{
+                    type: 'map',
+                    mapType: 'china',
+                    label: {
+                        normal: {
+                            show: false
+                        },
+                        emphasis: {
+                            textStyle: {
+                                color: '#fff'
+                            }
+                        }
+                    },
+                    itemStyle: {
+
+                        normal: {
+                            borderColor: '#ffe420',
+                            areaColor: '#F8F8F8',
+                        },
+                        emphasis: {
+                            areaColor: '#389BB7',
+                            borderWidth: 0
+                        }
+                    },
+                    animation: false,
+                    data: this.optionData
+
+                }],
+
+            };
+            chart.setOption(option);
+            wepy.removeStorage({key:'footData'});
+            this.$broadcast('setQrcode');
+
+        }
+
+        onShareAppMessage() {
+            return {
+                title: '既然走不过人家，咱就吃他个五湖四海',
+                path: '/pages/foot/index?share_openid='+this.openid,
+                success: function(res) {
+                    // 转发成功
+                },
+                fail: function(res) {
+                    // 转发失败
+                }
+            }
+        }
+
+        onLoad(option) {
+            console.log('foot/index-onLoad',option);
+            this.optionData=wepy.getStorageSync('footData');
+            let userinfo=wepy.getStorageSync('userinfo');
+            if(userinfo){
+                this.openid=userinfo.openId;
+            }
+
+        }
+        onShow(){
+            console.log('foot/index-onShow');
+            setTimeout(res=>{
+                this.setChartOption();
+            },2000);
+        }
+        methods = {
+            saveLocalImg(){
+                this.$broadcast('canvasToTempFilePath');
+            },
+            navigatorCreate(){
+                console.log('navigatorCreate',arguments);
+                wepy.redirectTo({
+                    url:'./create'
+                });
+            }
+        }
+    }
+</script>

@@ -44,4 +44,6 @@ export default {
     activityItems:{act:'activityItems/{item_id}',code:'14000',type:'PUT',timeout:0},
 
     itemName:{act:'itemName/{name}',code:'20000',type:'GET',timeout:0,silence:true},
+
+    footData:{act:'footData',code:'30000',type:'GET',timeout:0},
 }

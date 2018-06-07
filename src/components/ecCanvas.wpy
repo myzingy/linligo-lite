@@ -1,0 +1,121 @@
+<style>
+    .ec-canvas{
+    }
+</style>
+<template>
+    <canvas id="eChart" class="ec-canvas" canvas-id="eChart" style="height:400px;width:100%;"></canvas>
+</template>
+<script>
+    import wepy from 'wepy'
+    import * as echarts from '../util/ec-canvas/echarts'
+    import WxCanvas from '../util/ec-canvas/wx-canvas'
+    export default class ecCanvas extends wepy.component {
+        props = {
+            ec: {
+                type: Object
+            },
+            canvasId: {
+                type: String,
+                default: 'eChart'
+            }
+        }
+        data = {
+            ec: null,
+            canvasId: null,
+            chart: null,
+            ctx:null,
+            canvas:null,
+        }
+        onLoad() {
+            const version = wx.version.version.split('.').map(n => parseInt(n, 10))
+            const isValid = version[0] > 1 || (version[0] === 1 && version[1] >= 9) || (version[0] === 1 && version [1] === 9 && version[2] >= 91)
+            if (!isValid) {
+                console.error('This version of Wexin is not supported by ECharts. Please update Wexin with versions after 1.9.91')
+                return
+            }
+            this.ctx = wx.createCanvasContext(this.canvasId, this.$wxpage)
+            this.canvas = new WxCanvas(this.ctx)
+            echarts.setCanvasCreator(() => {
+                return this.canvas
+            })
+            var query = wx.createSelectorQuery().in(this.$wxpage)
+            query.select('.ec-canvas').boundingClientRect(res => {
+                if (this.ec && this.ec.onInit) {
+                    this.chart = this.ec.onInit(this.canvas, res.width, res.height)
+                }
+            }).exec()
+            //this.setQrcode();
+        }
+        setQrcode(){
+            wepy.getSystemInfo().then(res=>{
+                console.log('getSystemInfo',res);
+                let li=parseInt((res.windowWidth-75)/2);
+                wepy.downloadFile({url: 'https://009.vking.wang/images/75.png'}).then(img=>{
+                    console.log('downloadFile',img);
+                    this.ctx.drawImage(img.tempFilePath, li, 70, 75, 75)
+                    this.ctx.draw(true)
+                }).catch(imgerr=>{
+                    console.log('downloadFile',imgerr);
+                    this.setQrcode();
+                });
+            });
+        }
+        methods = {
+            touchStart: function(e) {
+                if (this.chart && e.touches.length > 0) {
+                    var touch = e.touches[0]
+                    this.chart._zr.handler.dispatch('mousedown', {
+                        zrX: touch.x,
+                        zrY: touch.y
+                    })
+                    this.chart._zr.handler.dispatch('mousemove', {
+                        zrX: touch.x,
+                        zrY: touch.y
+                    })
+                }
+            },
+            touchMove: function(e) {
+                if (this.chart && e.touches.length > 0) {
+                    var touch = e.touches[0];
+                    this.chart._zr.handler.dispatch('mousemove', {
+                        zrX: touch.x,
+                        zrY: touch.y
+                    })
+                }
+            },
+            touchEnd: function (e) {
+                if (this.chart) {
+                    var touch = e.changedTouches ? e.changedTouches[0] : {}
+                    this.chart._zr.handler.dispatch('mouseup', {
+                        zrX: touch.x,
+                        zrY: touch.y
+                    })
+                    this.chart._zr.handler.dispatch('click', {
+                        zrX: touch.x,
+                        zrY: touch.y
+                    })
+                }
+            }
+        }
+        events={
+            canvasToTempFilePath:()=>{
+                wx.canvasToTempFilePath({
+                    canvasId: 'eChart',
+                    success: function(res) {
+                        console.log(res.tempFilePath);
+                        wx.saveImageToPhotosAlbum({
+                            filePath:res.tempFilePath,
+                            success(res) {
+                                console.log(res);
+                            }
+                        })
+                    }
+                });
+            },
+            setQrcode:()=>{
+                this.setQrcode();
+            }
+        }
+
+    }
+</script>

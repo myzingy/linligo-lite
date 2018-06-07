@@ -80,6 +80,9 @@
                 'pages/me/index',
                 'pages/me/purchase',
 
+                'pages/foot/index',
+                'pages/foot/create',
+
             ],
             window: {
                 backgroundTextStyle: 'light',
@@ -130,7 +133,7 @@
                         'formIds':JSON.stringify(formIds),
                         'openid':openid,
                     }
-                    console.log('config request: ', p);
+                    console.log('request config: ', p);
                     // 必须返回OBJECT参数对象，否则无法发送请求到服务端
                     return p;
                 },
@@ -181,9 +184,11 @@
 
         onLaunch(launchRes) {
             console.log('app-onLaunch',launchRes);
-            this.bindGroupid(launchRes,true);
-            this.wxLogin();
-            this.getStorageInit();
+            if(launchRes.path.indexOf('/foot/')<0){
+                this.bindGroupid(launchRes,true);
+                this.wxLogin();
+                this.getStorageInit();
+            }
         }
         onShow(res){
             console.log('app-onShow',res);

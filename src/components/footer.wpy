@@ -22,7 +22,8 @@
         events = {};
 // Other properties
         onLoad(option){
-            console.log('footer-onLoad',option);
+            console.log('footer-onLoad',this.$parent.$name);
+            if(this.$parent.$name.indexOf('Foot')==0) return;
             //this.$parent.$parent.checkLoginState();
             //this.$parent.$parent.getStorageInit();
             this.$parent.$parent.checkSerLogin();

@@ -1,0 +1,179 @@
+<style lang="less">
+    .weui-navbar{
+        border-width:0;
+    }
+    .weui-navbar__item{
+        border-radius: 5px;
+        border: 1px solid #fff;
+        margin-bottom: 10px;
+        padding: 10px 5px;
+        background-color: #fff;
+    }
+    .weui-bar__item_on{
+        background-color: rgb(255, 87, 10);
+        border-color: rgb(255, 87, 10);
+        color:#fff;
+        .weui-navbar__title{
+            color:#fff;
+
+        }
+    }
+    .checkNum{
+        padding: 0px;
+        border-radius: 10px;
+        width: 20px;
+        height: 20px;
+        overflow: hidden;
+        display: inline-block;
+        line-height: 20px;
+        position: absolute;
+        top:-10px;
+        right:-10px;
+    }
+</style>
+<template>
+    <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
+        <view class="page__bd" style="padding: 10px;">
+            <view class="weui-tab" style="display: flex; flex-direction: row; position: relative;">
+                <view class="weui-navbar" style="display: block;width:200rpx;position: relative; margin-right: 10px;">
+                    <block wx:for="{{footData.tabs}}" wx:key="footData-tabs-key">
+                        <view id="{{index}}" class="weui-navbar__item {{activeIndex == index ? 'weui-bar__item_on' : ''}}" bindtap="tabClick">
+                            <view class="weui-navbar__title">
+                                {{item.name}}
+                                <text class="bg-color-red color-white checkNum"
+                                      wx:if="{{item.checkNum>0}}">{{item.checkNum}}</text>
+                            </view>
+                        </view>
+                    </block>
+                </view>
+                <view class="weui-tab__panel" style="position: relative; padding-top: 0rpx; height: {{footDataHeight}}px; overflow-y: auto;">
+                    <view class="weui-tab__content"
+                          hidden="{{activeIndex != fi}}" wx:for="{{footData.list}}"
+                          wx:key="footData-list-key" wx:for-index="fi">
+                            <button wx:for="{{item}}" wx:key="footData-list-item-key"
+                                    style="display: inline-block;margin-right: 8px;width: 70px; overflow: hidden; padding: 0; white-space : nowrap"
+                                    class="{{item.checked ? 'weui-bar__item_on' : ''}}"
+                                    bindtap="checkedClick" data-index="{{index}}">
+                                {{item.name}}
+                            </button>
+                    </view>
+                </view>
+            </view>
+            <button type="primary" @tap="submit" disabled="{{!(checkNum>0)}}">我保证，我都吃过</button>
+        </view>
+
+    </view>
+    <footer></footer>
+</template>
+<script>
+    import wepy from 'wepy'
+    import URI from '../../util/uri'
+    import footer from '../../components/footer';
+    export default class FootCreate extends wepy.page {
+        config = {
+            navigationBarTitleText: '邻里逛市场'
+        }
+        components = {
+            footer: footer,
+        }
+        data = {
+            activeIndex: 0,
+            footData:{},
+            footDataHeight:0,
+            checkNum:0,
+        }
+        onLoad(option) {
+            this.getFootData();
+            console.log('create-onLoad',option);
+            var that = this;
+            wx.getSystemInfo({
+                success: function(res) {
+                    console.log('getSystemInfo',res);
+                    that.footDataHeight=res.windowHeight-120;
+                    that.$apply();
+                }
+            });
+            this.userInfo=this.$parent.globalData.userInfo;
+            this.hasPhone=this.$parent.globalData.phone;
+            if(typeof option.share_openid!='undefined'){
+                wepy.setStorage({
+                    key:'share_openid',
+                    data:option.share_openid
+                });
+            }
+
+        }
+        onShow(){
+            console.log('create-onShow');
+            if(!this.userInfo){
+                this.$parent.getStorageInit();
+                this.hasPhone=this.$parent.globalData.phone;
+                this.userInfo=this.$parent.globalData.userInfo;
+            }
+
+        }
+
+        methods = {
+            tabClick: function (e) {
+                this.sliderOffset=e.currentTarget.offsetLeft;
+                this.activeIndex=e.currentTarget.id;
+                this.$apply();
+            },
+            checkedClick(e){
+                let index=e.currentTarget.dataset.index;
+                if(typeof this.footData.list[this.activeIndex][index].checked !='undefined'){
+                    this.footData.list[this.activeIndex][index].checked=!this.footData.list[this.activeIndex][index].checked;
+                    if(this.footData.list[this.activeIndex][index].checked){
+                        this.footData.tabs[this.activeIndex].checkNum+=1;
+                    }else{
+                        this.footData.tabs[this.activeIndex].checkNum-=1;
+                    }
+                    let checkNum=0;
+                    this.footData.tabs.forEach((item)=>{
+                        checkNum+=item.checkNum;
+                    });
+                    this.checkNum=checkNum;
+                }
+                this.$apply();
+            },
+            submit(){
+                let foo={};
+                let ror=this.footData.ror;
+                this.footData.list.forEach(items=>{
+                    console.log('items',items);
+                    items.forEach(item=>{
+                        if(item.checked){
+                            let ps=ror[item.name];
+                            if(!ps) return;
+                            console.log('ps',ps);
+                            Object.keys(ps).forEach(p=>{
+                                foo[p]=(foo[p])?foo[p]:0;
+                                foo[p]+=ps[p];
+                            });
+                        }
+                    })
+                });
+                let data=[];
+                Object.keys(foo).forEach(p=>{
+                    data.push({ name: p, value: foo[p] });
+                });
+                //console.log('submit',data);
+                wepy.setStorageSync('footData',data);
+                //data=JSON.stringify(data);
+                wepy.redirectTo({
+                    url:'./index'
+                });
+
+            }
+        }
+        async getFootData(){
+            let params={
+                url:URI.footData,
+            }
+            wepy.request(params).then((footData) =>{
+                this.footData=footData
+                this.$apply();
+            });
+        }
+    }
+</script>
