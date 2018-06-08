@@ -4,7 +4,10 @@
         <view class="page__bd" style="margin-top: 10px;">
             <ecCanvas :ec.sync="ec" id="mychart-dom-save"></ecCanvas>
             <view class="weui-panel weui-panel_access" style="padding: 10px;">
-                <button type="warn" @tap="saveLocalImg" wx:if="{{optionData.length>0}}" >保存图片</button>
+                <view style="display: flex;flex-direction: row; margin-bottom: 10px;" wx:if="{{optionData.length>0}}">
+                    <button type="warn" open-type="share" class="bg-color-kuaixiao">分享好友</button>
+                    <button type="primary" @tap="saveLocalImg">保存图片</button>
+                </view>
                 <button type="warn" @tap="navigatorCreate">开 吃</button>
             </view>
         </view>
@@ -32,7 +35,10 @@
             backgroundColor: '#f8f8f8',
             title: {
                 text: '既然走不过人家，\n\n咱就吃他个五湖四海',
-                left: 'center',
+                textStyle: {
+                    fontSize: 26
+                },
+                x: 'center'
             },
             visualMap: {
                 show: false,
@@ -90,7 +96,7 @@
             navigationBarTitleText: '邻里逛市场',
             usingComponents: {
                 //ecCanvas: ecCanvas,
-                "ec-canvas": "../../util/ec-canvas/ec-canvas"
+                //"ec-canvas": "../../util/ec-canvas/ec-canvas"
             }
         }
         components = {
@@ -106,24 +112,69 @@
             optionData:[],
             chart:null,
         }
-        setChartOption() {
+        async setChartOption() {
+            if(!chart){
+                if(!this.chackChartInterval){
+                    console.log('this.chackChartInterval',this.chackChartInterval);
+//                    this.chackChartInterval=setInterval(res=>{
+//
+//                    },100)
+                    await this.$parent.sleep(1);
+                    this.setChartOption();
+                }
+                return;
+            }else{
+                if(this.chackChartInterval){
+                    clearInterval(this.chackChartInterval);
+                }
+            }
             let ll=this.optionData.length;
             if(ll<1) return;
             let lm=0;
+            let subtext=[]
             this.optionData.forEach(px=>{
                 if(px.value>=80){
                     lm+=1;
+                    subtext.push(px.name);
                 }
+
             });
-            let title_text='吃遍了'+ll+'个省，\n\n你还年轻，努力加油吧'
+            let subtextstr='';
+            if(subtext.length>0){
+                subtextstr+='\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n';
+                subtextstr+='获得以下省城终身荣誉:\n\n'+subtext.toString();
+            }
+            let title_text='吃遍了 '+ll+' 个省，\n\n你还年轻，努力加油吧'
             if(lm>0){
-                title_text='吃遍了'+ll+'个省，\n\n被你吃垮了'+lm+'个省'
+                title_text='吃遍了 '+ll+' 个省，\n\n被你吃垮了 '+lm+' 个省'
+            }
+            let cs=[
+                'rgb(230,67,60)','rgb(9,187,7)','rgb(87,107,149)','rgb(255, 87, 10)',
+                'rgb(230,230,60)','rgb(230,67,230)',
+                'rgb(187,187,7)','rgb(9,187,187)',
+                'rgb(149,107,149)','rgb(87,149,149)',
+                'rgb(200, 200, 10)','rgb(255, 87, 255)'
+            ];
+            //let csi=parseInt(Math.random()*cs.length+3);
+            let csi=15;
+            let color=cs[csi];
+            if(!color){
+                color= 'rgb(' + [
+                        Math.round(Math.random() * 200),
+                        Math.round(Math.random() * 200),
+                        Math.round(Math.random() * 200)
+                    ].join(',') + ')';
             }
             const option = {
                 backgroundColor: '#f8f8f8',
                 title: {
                     text: title_text,
-                    left: 'center',
+                    textStyle: {
+                        fontSize: 26,
+                        color: color,
+                    },
+                    x: 'center',
+                    subtext: subtextstr,
                 },
                 visualMap: {
                     show: false,
@@ -148,7 +199,7 @@
                     text: ['高    (元/平方公里)', '低    (元/平方公里)'], // 文本，默认为数值文本
                     calculable: true,
                     inRange: {
-                        color: ['#fff9ce', '#ff0000'] //
+                        color: ['#fff9ce', color] //
                     }
                 },
                 series: [{
@@ -167,7 +218,7 @@
                     itemStyle: {
 
                         normal: {
-                            borderColor: '#ffe420',
+                            borderColor: color,
                             areaColor: '#F8F8F8',
                         },
                         emphasis: {
@@ -179,12 +230,17 @@
                     data: this.optionData
 
                 }],
-
+//                legend: {
+//                    top: '-150%',
+//                    itemWidth: 24,
+//                    itemHeight: 24,
+//                    data: [{name:'',icon:'cricle'}]
+//                },
             };
             chart.setOption(option);
-            wepy.removeStorage({key:'footData'});
-            this.$broadcast('setQrcode');
-
+            //wepy.removeStorage({key:'footData'});
+            //this.$broadcast('setQrcode-broadcast');
+            this.$invoke('ecCanvas','setQrcode');
         }
 
         onShareAppMessage() {
@@ -201,23 +257,24 @@
         }
 
         onLoad(option) {
-            console.log('foot/index-onLoad',option);
-            this.optionData=wepy.getStorageSync('footData');
             let userinfo=wepy.getStorageSync('userinfo');
             if(userinfo){
                 this.openid=userinfo.openId;
             }
-
         }
         onShow(){
             console.log('foot/index-onShow');
-            setTimeout(res=>{
-                this.setChartOption();
-            },2000);
+            let optionData=wepy.getStorageSync('footData');
+            console.log('this.optionData',typeof optionData,this.optionData);
+            if(typeof optionData!='object'){
+                optionData=[];
+            }
+            this.optionData=optionData;
+            this.setChartOption();
         }
         methods = {
             saveLocalImg(){
-                this.$broadcast('canvasToTempFilePath');
+                this.$invoke('ecCanvas','canvasToTempFilePath');
             },
             navigatorCreate(){
                 console.log('navigatorCreate',arguments);

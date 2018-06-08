@@ -3,7 +3,7 @@
     }
 </style>
 <template>
-    <canvas id="eChart" class="ec-canvas" canvas-id="eChart" style="height:400px;width:100%;"></canvas>
+    <canvas id="eChart" class="ec-canvas" canvas-id="eChart" style="height:450px;width:100%;"></canvas>
 </template>
 <script>
     import wepy from 'wepy'
@@ -46,20 +46,7 @@
             }).exec()
             //this.setQrcode();
         }
-        setQrcode(){
-            wepy.getSystemInfo().then(res=>{
-                console.log('getSystemInfo',res);
-                let li=parseInt((res.windowWidth-75)/2);
-                wepy.downloadFile({url: 'https://009.vking.wang/images/75.png'}).then(img=>{
-                    console.log('downloadFile',img);
-                    this.ctx.drawImage(img.tempFilePath, li, 70, 75, 75)
-                    this.ctx.draw(true)
-                }).catch(imgerr=>{
-                    console.log('downloadFile',imgerr);
-                    this.setQrcode();
-                });
-            });
-        }
+
         methods = {
             touchStart: function(e) {
                 if (this.chart && e.touches.length > 0) {
@@ -97,8 +84,41 @@
                 }
             }
         }
+        setQrcode(){
+            wepy.getSystemInfo().then(res=>{
+                console.log('getSystemInfo',res);
+                let li=parseInt((res.windowWidth-75)/2);
+                wepy.downloadFile({url: 'https://009.vking.wang/images/75.png'}).then(img=>{
+                    console.log('downloadFile',img);
+                    this.ctx.drawImage(img.tempFilePath, li, 90, 75, 75)
+                    this.ctx.draw(true);
+                }).catch(imgerr=>{
+                    console.log('downloadFile',imgerr);
+                    this.setQrcode();
+                });
+            });
+        }
+        canvasToTempFilePath(){
+            wx.canvasToTempFilePath({
+                canvasId: 'eChart',
+                success: function(res) {
+                    console.log(res.tempFilePath);
+                    wx.saveImageToPhotosAlbum({
+                        filePath:res.tempFilePath,
+                        success(res) {
+                            console.log(res);
+                            wx.showToast({
+                                title: '已保存到相册',
+                                icon: 'success',
+                                duration: 2000
+                            })
+                        }
+                    })
+                }
+            });
+        }
         events={
-            canvasToTempFilePath:()=>{
+            'canvasToTempFilePath-broadcast':($event, ...args)=>{
                 wx.canvasToTempFilePath({
                     canvasId: 'eChart',
                     success: function(res) {
@@ -107,13 +127,23 @@
                             filePath:res.tempFilePath,
                             success(res) {
                                 console.log(res);
+                                wx.showToast({
+                                    title: '已保存到相册',
+                                    icon: 'success',
+                                    duration: 2000
+                                })
                             }
                         })
                     }
                 });
+                $event.$destroy();
             },
-            setQrcode:()=>{
-                this.setQrcode();
+            'setQrcode-broadcast':function($event, ...args){
+                console.log('setQrcode',$event);
+//                this.setQrcode().catch(res=>{
+//                    this.setQrcode()
+//                });
+                $event.$destroy();
             }
         }
 

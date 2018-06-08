@@ -140,12 +140,12 @@
                 let foo={};
                 let ror=this.footData.ror;
                 this.footData.list.forEach(items=>{
-                    console.log('items',items);
+                    //console.log('items',items);
                     items.forEach(item=>{
                         if(item.checked){
                             let ps=ror[item.name];
                             if(!ps) return;
-                            console.log('ps',ps);
+                            //console.log('ps',ps);
                             Object.keys(ps).forEach(p=>{
                                 foo[p]=(foo[p])?foo[p]:0;
                                 foo[p]+=ps[p];
@@ -157,13 +157,12 @@
                 Object.keys(foo).forEach(p=>{
                     data.push({ name: p, value: foo[p] });
                 });
-                //console.log('submit',data);
+                console.log('submit',data);
                 wepy.setStorageSync('footData',data);
                 //data=JSON.stringify(data);
                 wepy.redirectTo({
                     url:'./index'
                 });
-
             }
         }
         async getFootData(){
