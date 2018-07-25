@@ -76,6 +76,7 @@
                 'pages/purchase/info',
                 'pages/purchase/new',
                 'pages/purchase/details',
+                'pages/purchase/category',
 
                 'pages/me/index',
                 'pages/me/purchase',
@@ -216,9 +217,14 @@
             //微信自己的code 状态
             let wxLoginState = await wepy.checkSession().then(res => {return true}, res => {return false});
             let code =wepy.getStorageSync('login_code');
+            console.log('wxLogin',wxLoginState,code);
             if(!wxLoginState || !code){
                 let {code: code} = await wepy.login();
-                wepy.setStorage({key:'login_code',data:code});
+                wepy.setStorageSync('login_code',code);
+                let access_token = wepy.getStorageSync('access_token');
+                if(access_token){
+                    this.serLogin();
+                }
             }
         }
         async checkSerLogin(){
@@ -226,6 +232,10 @@
             if(!access_token){
                 let {code: code} = await wepy.login();
                 wepy.setStorage({key:'login_code',data:code});
+
+                let p=getCurrentPages();
+                if(p[p.length-1].route=="pages/login") return;
+
                 wepy.navigateTo({
                     url: '/pages/login'
                 })
@@ -241,9 +251,9 @@
                 let access_token = wepy.getStorageSync('access_token')
                 console.log('app-serLogin:code,access_token',code,access_token);
                 if(code){
-                    if(access_token){
-                        return resolve();
-                    }
+//                    if(access_token){
+//                        return resolve();
+//                    }
                     let {iv: iv, encryptedData: encryptedData, userInfo: userInfo} = await wepy.getUserInfo({withCredentials: true})
 
                     let loginData = {code: code, iv: iv, encryptedData: encryptedData}
@@ -338,6 +348,13 @@
                 });
             });
         }
+        toast(msg){
+            wepy.showToast({
+                title: msg,
+                icon: 'none',
+                duration: 2000
+            })
+        }
         formIds(e){
             if(!e) return wepy.getStorageSync('formIds');
             if(e=='clear' || e=='clean') return wepy.removeStorage({key:'formIds'});
@@ -393,6 +410,29 @@
             }).catch(wres=>{
                 console.log('getShareInfo fail',wres);
             })
+        }
+         compareVersion(min_ver,now_ver) {
+             min_ver = min_ver.split('.')
+             now_ver = now_ver.split('.')
+             let len = Math.max(now_ver.length, min_ver.length)
+
+             while (min_ver.length < len) {
+                 min_ver.push('0')
+             }
+             while (now_ver.length < len) {
+                 now_ver.push('0')
+             }
+             let lt=false;
+             for (let i = 0; i < len; i++) {
+                 let num1 = parseInt(now_ver[i])
+                 let num2 = parseInt(min_ver[i])
+
+                 if (num1 < num2) {
+                     lt=true;
+                     break;
+                 }
+             }
+             return !lt;
         }
     }
 </script>

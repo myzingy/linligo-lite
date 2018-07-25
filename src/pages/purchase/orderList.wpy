@@ -6,35 +6,36 @@
         <view class="page__bd">
             <view class="weui-panel weui-panel_access" wx:for="{{purchase}}"
                   wx:for-index="orderIndex"
+                  wx:for-item="order"
                   wx:key="orderKey">
                 <view class="weui-panel__bd">
                     <view class="weui-media-box weui-media-box_appmsg">
                         <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
-                            <image class="weui-media-box__thumb" src="{{item.wxuser.userinfo.avatarUrl}}" />
+                            <image class="weui-media-box__thumb" src="{{order.wxuser.userinfo.avatarUrl}}" />
                         </view>
                         <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
-                            <view class="weui-media-box__title">{{item.nickname}}</view>
+                            <view class="weui-media-box__title">{{order.nickname}}</view>
                             <view class="weui-media-box__desc">
                                 <view class="weui-badge">
-                                    佣金 {{item.commission/100}} 元
+                                    佣金 {{order.commission/100}} 元
                                 </view>
                                 <view class="weui-badge bg-color-blue" style="margin-left: 5px;">
-                                    {{item.distribution}}
+                                    {{order.distribution}}
                                 </view>
                                 <view class="weui-badge bg-color-green"
-                                      style="margin-left: 5px;" @tap="callPhone" data-phone="{{item.wxuser.phone}}">
-                                    {{item.wxuser.phone}}
+                                      style="margin-left: 5px;" @tap="callPhone" data-phone="{{order.wxuser.phone}}">
+                                    {{order.wxuser.phone}}
                                 </view>
                             </view>
-                            <view class="weui-media-box__desc" style="margin-top: 5px;" wx:if="{{item.distribution=='送货到家'}}">
+                            <view class="weui-media-box__desc" style="margin-top: 5px;" wx:if="{{order.distribution=='送货到家'}}">
                                 <text class="color-blue">配送地址：</text>
-                                {{item.address.userName}}
+                                {{order.address.userName}}
                                 <view class="weui-badge bg-color-green"
-                                      style="margin-left: 5px;" @tap="callPhone" data-phone="{{item.address.telNumber}}">
-                                    {{item.address.telNumber}}
+                                      style="margin-left: 5px;" @tap="callPhone" data-phone="{{order.address.telNumber}}">
+                                    {{order.address.telNumber}}
                                 </view>
                                 <view>
-                                    {{item.address.detailInfo}}
+                                    {{order.address.detailInfo}}
                                 </view>
                             </view>
                         </view>
@@ -42,7 +43,7 @@
                 </view>
                 <view class="weui-panel__ft">
                     <view class="weui-cell weui-cell_access weui-cell_link"
-                          wx:for="{{item.items}}"
+                          wx:for="{{order.items}}"
                           wx:for-index="itemIndex"
                           wx:key="itemKey">
                         <view class="weui-cell__bd" wx:if="{{item.status==12}}">
@@ -95,7 +96,7 @@
                     <view class="weui-cell weui-cell_input weui-cell_vcode">
                         <view class="weui-cell__hd bg-color-blue color-black-light"
                               style="text-align: center; margin-right: 10rpx; padding: 5px 10px">
-                            <view>{{status[item.status]}}，{{item.totalPrice}}元</view>
+                            <view>{{status[order.status]}}，{{order.totalPrice/1+order.commission/100}}元</view>
                         </view>
                         <view class="weui-cell__bd">
                             <input class="weui-input"

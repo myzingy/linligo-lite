@@ -17,7 +17,7 @@
                                 <view class="weui-media-box__title weui-media-box__title_in-text">{{item.slogan}}</view>
                                 <view class="weui-media-box__desc">
                                     <view>{{item.goto}}，{{item.stime}} 至 {{item.etime}}</view>
-                                    <view>{{item.city}}·{{item.region}}</view>
+                                    <!--<view>{{item.city}}·{{item.region}}</view>-->
                                 </view>
                                 <view class="weui-media-box__info">
                                     <view class="weui-media-box__info__meta">{{status[item.status]}}</view>

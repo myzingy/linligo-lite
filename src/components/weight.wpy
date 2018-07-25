@@ -1,0 +1,146 @@
+<style lang="less">
+    .weui-weight-mask{
+        position: fixed;
+        bottom: 0;
+        padding-bottom: 200%;
+        height:0;
+        background-color: rgba(11,11,11,.5);
+        width:100%;
+        z-index: 9998;
+    }
+    .weight{
+        position: fixed;
+        top: 0;
+        height:230px;
+        border-bottom: 5px solid #9b9b9b;
+        background-color: #fff;
+        width:100%;
+        z-index: 9999;
+        padding-top: 20px;
+    }
+</style>
+<template>
+    <view class="weui-weight-mask" @tap="hiddenWeight" hidden="{{hasHiddenWeight}}">
+
+    </view>
+    <view class="weight" hidden="{{hasHiddenWeight}}">
+        <view class="weui-cell">
+        <image src="http://009-img.vking.wang/category/{{checked.name}}.jpg"
+               mode="center"
+               style="width:80%; margin: 0 auto; height: 100px;"></image>
+        </view>
+        <view class="weui-cell weui-cell_input">
+            <view class="weui-cell__hd">
+                <view class="weui-label" style="width: auto; padding-right: 10px;">{{checked.name}}</view>
+            </view>
+            <view class="weui-cell__bd">
+                <input name="weight" placeholder="请输入数量/重量" type="digit"
+                       style="border-bottom: 1px solid #ccc;"
+                       value="{{form.weight}}" bindchange="apply"
+                       data-formkey="weight"/>
+            </view>
+            <view class="weui-cell__hd">
+                <view class="weui-label">
+                    <picker name="dateIndex" mode="selector" value="{{form.unitIndex}}" range="{{unitsRange}}"
+                            data-formkey="unitIndex" bindchange="apply">
+                        <view class="picker">
+                            <text class="weui-badge weui-badge_dot"
+                                  style="line-height: 16rpx;height: 36rpx; padding-top: 0; margin-right: 10rpx;" >
+                                {{form.weight_unit}}
+                            </text>
+                            <text class="weui-cell_link">切换单位</text>
+                        </view>
+                    </picker>
+                </view>
+            </view>
+
+        </view>
+        <view style="border-width: 0; display: flex;flex-direction: row;">
+            <button style="width: 35%" @tap="submit" data-type="no">不要了</button>
+            <button style="width: 60%" type="primary" @tap="submit" data-type="yes">确 定</button>
+        </view>
+    </view>
+</template>
+<script>
+    import wepy from 'wepy';
+    import daa from '../pages/data'
+    export default class weight extends wepy.component {
+        components = {};
+
+        data = {
+            unitsRange:daa.units,
+            form:{
+                unitIndex: 0,
+                weight_unit: daa.units[0],
+                weight:"",
+            },
+            checked:{
+                name:"",
+            },
+            hasHiddenWeight:true,
+        };
+        methods = {
+            apply(e){
+                console.log('apply', e);
+                let formkey = e.target.dataset.formkey;
+                this.form[formkey] = e.detail.value;
+                this.form.weight_unit = this.unitsRange[this.form.unitIndex];
+                this.$apply();
+            },
+            hiddenWeight(){
+                this.hasHiddenWeight=true;
+                this.$apply();
+            },
+            submit(e){
+                console.log('submit', e);
+                let type = e.target.dataset.type;
+                let data=wepy.getStorageSync('checked-items-weight-unit') || {};
+                if(type=='yes'){
+                    if(!(/[0-9\.]+/.test(this.form.weight) && this.form.weight>0)){
+                        this.$parent.$parent.toast('请输入正确数值');
+                        return;
+                    }
+                    data[this.checked.name]={...this.form,
+                        name:this.checked.name
+                    }
+                    this.checked.flag=true;
+                }else{
+                    delete data[this.checked.name];
+                    this.checked.flag=false;
+                }
+                wepy.setStorage({
+                    'key':'checked-items-weight-unit',
+                    'data':data
+                }).then(res=>{
+                    this.$parent.checkedItemsDisplay(this.checked);
+                    this.hasHiddenWeight=true;
+                    this.$apply();
+                });
+            }
+        };
+
+        events = {
+
+        };
+// Other properties
+        onLoad(option){
+            console.log('footer-onLoad',this.$parent.$name);
+        }
+        showWeightDialog(checked){
+            console.log('showWeightDialog');
+            this.hasHiddenWeight=false;
+            this.checked=checked;
+            let data=wepy.getStorageSync('checked-items-weight-unit') || {};
+            if(data[checked.name]){
+                this.form=data[checked.name];
+            }else{
+                this.form={
+                    unitIndex: 0,
+                    weight_unit: daa.units[0],
+                    weight:"",
+                };
+            }
+            this.$apply();
+        }
+    }
+</script>

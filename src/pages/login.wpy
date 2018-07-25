@@ -93,8 +93,16 @@
                 console.log('login-bindGetUserInfo',e.detail);
                 if(e.detail.errMsg=='getUserInfo:ok'){
                     this.$parent.serLogin().then((res)=>{
-                        console.log('this.$parent.serLogin() then',res)
-                        wepy.navigateBack();
+                        let p=getCurrentPages();
+                        console.log('this.$parent.serLogin() then',p);
+                        let delta=1;
+                        for(let i=p.length;i>0;i--){
+                            if(p[i-1].route!="pages/login") break;
+                            delta+=1;
+                        }
+                        wepy.navigateBack({
+                            delta: delta
+                        });
                     }).catch((res)=>{
                         console.log('this.$parent.serLogin() fail',res)
                     })

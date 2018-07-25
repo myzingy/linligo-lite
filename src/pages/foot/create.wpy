@@ -35,7 +35,7 @@
     <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
         <view class="page__bd" style="padding: 10px;">
             <view class="weui-tab" style="display: flex; flex-direction: row; position: relative;">
-                <view class="weui-navbar" style="display: block;width:200rpx;position: relative; margin-right: 10px;">
+                <view class="weui-navbar" style="display: block;width:150rpx;min-width:150rpx;position: relative; padding-top: 10px;padding-right: 20px;height: {{footDataHeight}}px; overflow-y: auto;">
                     <block wx:for="{{footData.tabs}}" wx:key="footData-tabs-key">
                         <view id="{{index}}" class="weui-navbar__item {{activeIndex == index ? 'weui-bar__item_on' : ''}}" bindtap="tabClick">
                             <view class="weui-navbar__title">
@@ -59,7 +59,7 @@
                     </view>
                 </view>
             </view>
-            <button type="primary" @tap="submit" disabled="{{!(checkNum>0)}}">我保证，我都吃过</button>
+            <button type="primary" @tap="submit" disabled="{{!(checkNum>0)}}">选好了，开始绘制</button>
         </view>
 
     </view>
@@ -71,7 +71,7 @@
     import footer from '../../components/footer';
     export default class FootCreate extends wepy.page {
         config = {
-            navigationBarTitleText: '邻里逛市场'
+            navigationBarTitleText: '美食地图'
         }
         components = {
             footer: footer,
@@ -153,9 +153,20 @@
                         }
                     })
                 });
+                let footData=this.footData;
+                let getfootDataTabsVal=function(p,v){
+                    for(let x in footData.tabs){
+                        if(p==footData.tabs[x].name){
+                            let cc=footData.list[x].length*10;
+                            v=(v*100)/cc;
+                            break;
+                        }
+                    }
+                    return { name: p, value: v }
+                }
                 let data=[];
                 Object.keys(foo).forEach(p=>{
-                    data.push({ name: p, value: foo[p] });
+                    data.push(getfootDataTabsVal(p,foo[p]));
                 });
                 console.log('submit',data);
                 wepy.setStorageSync('footData',data);

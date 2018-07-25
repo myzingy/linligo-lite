@@ -12,10 +12,11 @@
                             <view class="weui-label">标语</view>
                         </view>
                         <view class="weui-cell__bd">
-                            <input name="slogan" placeholder="如：周末吃些新鲜健康的"
+                            <input name="slogan" placeholder="选填：我去市场了，你需要带东西吗？"
                                    value="{{form.slogan}}" data-formkey="slogan" bindchange="apply"/>
                         </view>
                     </view>
+                    <!--
                     <view class="weui-cell weui-cell_input">
                         <view class="weui-cell__hd">
                             <view class="weui-label">小区</view>
@@ -25,6 +26,7 @@
                                    value="{{form.region}}" data-formkey="region" bindchange="apply"/>
                         </view>
                     </view>
+                    -->
                     <view class="weui-cell weui-cell_input">
                         <view class="weui-cell__hd">
                             <view class="weui-label">去往</view>
@@ -124,7 +126,7 @@
                             <view class="weui-label">佣金</view>
                         </view>
                         <view class="weui-cell__bd">
-                            <slider name="commission" min="1" max="10" show-value
+                            <slider name="commission" min="0" max="10" show-value
                                     value="{{form.commission}}" data-formkey="commission" bindchange="apply"/>
                         </view>
                         <text>元</text>
@@ -159,7 +161,7 @@
                 etime: '08:00',
                 dateIndex: 0,
                 dateStr: '',
-                commission:1,
+                commission:0,
             },
             distribution:daa.distribution,
             types:daa.types,
@@ -200,12 +202,12 @@
         validateInit(){
             // 验证字段的规则
             const rules = {
-                slogan: {
-                    required: true
-                },
-                region: {
-                    required: true
-                },
+//                slogan: {
+//                    required: true
+//                },
+//                region: {
+//                    required: true
+//                },
                 goto: {
                     required: true
                 },
@@ -219,12 +221,12 @@
 
 // 验证字段的提示信息，若不传则调用默认的信息
             const messages = {
-                slogan: {
-                    required: '请填写标语'
-                },
-                region: {
-                    required: '请填写小区'
-                },
+//                slogan: {
+//                    required: '请填写标语'
+//                },
+//                region: {
+//                    required: '请填写小区'
+//                },
                 goto: {
                     required: '请填写去往地址'
                 },
@@ -382,6 +384,8 @@
                 }
                 this.form.location=this.location;
                 this.form.address=this.address;
+                this.form.slogan=this.form.slogan?this.form.slogan:'我要去市场了，你需要带东西吗？';
+                this.form.region=this.form.region?this.form.region:'region';
                 let params={
                     url:URI.purchaseCreate,
                     data:this.form,

@@ -47,7 +47,6 @@
     <view class="page" xmlns:wx="http://www.w3.org/1999/xhtml">
         <view class="page__bd">
             <view class="weui-panel weui-panel_access">
-
                 <view class="weui-panel__bd">
                     <view class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active">
 
@@ -96,7 +95,6 @@
                 </view>
                 </form>
             </view>
-
             <view class="weui-panel weui-panel_access">
                 <view class="weui-panel__hd">生活场景</view>
                 <view class="weui-article">
@@ -136,6 +134,22 @@
                     </view>
                 </view>
             </view>
+            <view class="weui-panel__ft bg-color-blue-10">
+                <view class="weui-cell weui-cell_access weui-cell_link">
+                    <view class="weui-cell__bd">
+                        <navigator url="/pages/foot/create"
+                                   class="color-kuaixiao" open-type="redirect">
+                            发现好玩，绘制美食足迹地图
+                        </navigator>
+                    </view>
+                    <view class="weui-cell__ft weui-cell__ft_in-access">
+                        <navigator url="/pages/foot/create" class="txt-btn"  open-type="redirect">
+                            <view class="color-kuaixiao" style="margin-left: 5px;">开始绘制</view>
+                        </navigator>
+                    </view>
+                </view>
+            </view>
+
         </view>
     </view>
     <footer></footer>

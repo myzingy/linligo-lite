@@ -70,8 +70,15 @@
                         </view>
                     </view>
                 </view>
-                <view class="weui-cells__title" wx:if="{{purchase.status==0}}">采购信息</view>
-                <view class="weui-cells weui-cells_after-title" wx:if="{{purchase.status==0}}">
+                <view style="padding: 10px;">
+                    <button class="weui-btn" type="primary"
+                            wx:if="{{purchase.status==0}}"
+                            formType="submit" data-formkey="orderSetting" data-goto="category">
+                        去挑选果蔬
+                    </button>
+                </view>
+                <view class="weui-cells__title" wx:if="{{purchase.status==0 && false}}">采购信息</view>
+                <view class="weui-cells weui-cells_after-title" wx:if="{{purchase.status==0 && false}}">
                     <view class="weui-cell weui-cell_input">
                         <view class="weui-cell__hd">
                             <view class="weui-label">商品名称</view>
@@ -107,7 +114,6 @@
                                 </picker>
                             </view>
                         </view>
-
                     </view>
                     <view class="weui-cell weui-cell_input">
                         <view class="weui-cell__bd">
@@ -170,7 +176,9 @@
 
                     </view>
                     <view class="weui-cell__ft" wx:if="{{totalPrice>0}}">
-                        合计：{{totalPrice}} 元
+                        合计：{{totalPrice}}+{{purchase.orders[0].commission}} =
+                        <text class="color-red"> {{totalPrice+purchase.orders[0].commission}} </text>
+                        元
                     </view>
                     <view class="weui-cell__ft" wx:else="">
                         等待发起者核算总价
@@ -222,6 +230,8 @@
             if(typeof option.act_id!='undefined'){
                 this.act_id=option.act_id;
             }
+        }
+        onShow(){
             this.getActivityOrder(this.act_id);
         }
         validateInit(type="ALL"){
@@ -303,6 +313,7 @@
             wepy.request(params).then(function (res) {
                 console.log('purchase：', res)
                 that.setActivityOrderData(res);
+                wepy.setStorage({key:'purchaseMyOrder',data:res});
             });
         }
         setActivityOrderData(res){
@@ -328,7 +339,7 @@
                             totalPrice+=(item.price/100)*(item.actual_weight/10);
                         }
                     }
-                    that.totalPrice=totalPrice.toFixed(2);
+                    that.totalPrice=parseFloat(totalPrice.toFixed(2));
                 }
             }
             that.form.name="";
@@ -377,6 +388,7 @@
         }
         submitOrderSetting(e){
             console.log('submitOrderSetting：', e.detail.value);
+            let goto=e.detail.target.dataset.goto;
             if (!this.WxValidate.checkForm(e)) {
                 const error = this.WxValidate.errorList[0];
                 console.log('WxValidate-error', error)
@@ -398,8 +410,13 @@
             }
             let that = this;
             wepy.request(params).then(function (res) {
-                console.log('purchaseMyOrderSet：', res)
-                that.setActivityOrderData(res);
+                console.log('purchaseMyOrderSet：', res);
+                if(goto=='category'){
+                    wepy.navigateTo({
+                        url:'./category?act_id='+res.id+'&order_id='+res.orders[0].id
+                    });
+                }
+                //that.setActivityOrderData(res,'setting');
             });
         }
         async chooseAddress() {

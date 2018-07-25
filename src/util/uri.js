@@ -33,6 +33,7 @@ export default {
     purchaseMyOrder:{act:'activity/myOrder/{act_id}',code:'11002',type:'GET',timeout:0},
     purchaseMyOrderSet:{act:'activity/myOrder',code:'11003',type:'POST',timeout:0,silence:true},
     purchaseMyOrderDel:{act:'activity/myOrder/{item_id}',code:'11004',type:'DELETE',timeout:0},
+    purchaseMyOrderBatchSet:{act:'activity/myOrderBatchSet',code:'11003',type:'POST',timeout:0,silence:true},
 
     activityPurchase:{act:'activityPurchase',code:'12000',type:'POST',timeout:0},
     activityPurchaseList:{act:'activityPurchase/{act_id}',code:'12001',type:'GET',timeout:0},
@@ -46,4 +47,5 @@ export default {
     itemName:{act:'itemName/{name}',code:'20000',type:'GET',timeout:0,silence:true},
 
     footData:{act:'footData',code:'30000',type:'GET',timeout:0},
+    category:{act:'category',code:'30000',type:'GET',timeout:0},
 }

@@ -41,6 +41,7 @@
 
                     </view>
                 </view>
+                <!--
                 <view class="weui-form-preview__ft">
                     <view class="weui-form-preview__btn weui-form-preview__btn_primary">
                         <form bindsubmit="formSubmit" report-submit="true">
@@ -57,6 +58,7 @@
                         </form>
                     </view>
                 </view>
+                -->
             </view>
 
             <view class="weui-panel">
@@ -141,13 +143,13 @@
                 <view class="weui-panel__bd">
                     <view class="weui-media-box weui-media-box_small-appmsg">
                         <view class="weui-cells weui-cells_in-small-appmsg">
-                            <button open-type="contact"
+                            <button open-type="{{canFeedback?'feedback':'contact'}}"
                                     class="weui-cell weui-cell_access new-activity" hover-class="weui-cell_active">
                                 <view class="weui-cell__hd" style="line-height: 20rpx;margin-right: 10rpx;">
                                     <icon type="download" size="20" class="color-red"></icon>
                                 </view>
                                 <view class="weui-cell__bd weui-cell_primary">
-                                    <view>联系我们</view>
+                                    <view>意见反馈</view>
                                 </view>
                                 <view class="weui-cell__ft weui-cell__ft_in-access"></view>
                             </button>
@@ -173,6 +175,7 @@
         data = {
             wxuser:"",
             hasPhone:"",
+            canFeedback:false,
         }
         onShareAppMessage() {
             return {
@@ -188,6 +191,11 @@
         }
         onLoad(option) {
             this.hasPhone=this.$parent.globalData.phone;
+            wepy.getSystemInfo().then(res=> {
+                this.canFeedback=this.$parent.compareVersion('2.1.0',res.SDKVersion);
+                console.log('this.canFeedback', res.SDKVersion,this.canFeedback);
+                this.$apply();
+            })
         }
         onShow(){
             this.getUser();

@@ -6,9 +6,11 @@
             <view class="weui-panel weui-panel_access" style="padding: 10px;">
                 <view style="display: flex;flex-direction: row; margin-bottom: 10px;" wx:if="{{optionData.length>0}}">
                     <button type="warn" open-type="share" class="bg-color-kuaixiao">分享好友</button>
+                    <text type="text" class="color-blue"
+                          style="line-height: 50px; text-decoration: underline;" @tap="setChartOption">换个颜色</text>
                     <button type="primary" @tap="saveLocalImg">保存图片</button>
                 </view>
-                <button type="warn" @tap="navigatorCreate">开 吃</button>
+                <button type="warn" @tap="navigatorCreate">寻找美味/小吃</button>
             </view>
         </view>
     </view>
@@ -34,7 +36,7 @@
         const option = {
             backgroundColor: '#f8f8f8',
             title: {
-                text: '既然走不过人家，\n\n咱就吃他个五湖四海',
+                text: '中华美食，博大精深！，\n\n开始绘制我的美食地图',
                 textStyle: {
                     fontSize: 26
                 },
@@ -93,7 +95,7 @@
     export default class FootIndex extends wepy.page {
 
         config = {
-            navigationBarTitleText: '邻里逛市场',
+            navigationBarTitleText: '美食地图',
             usingComponents: {
                 //ecCanvas: ecCanvas,
                 //"ec-canvas": "../../util/ec-canvas/ec-canvas"
@@ -114,26 +116,15 @@
         }
         async setChartOption() {
             if(!chart){
-                if(!this.chackChartInterval){
-                    console.log('this.chackChartInterval',this.chackChartInterval);
-//                    this.chackChartInterval=setInterval(res=>{
-//
-//                    },100)
-                    await this.$parent.sleep(1);
-                    this.setChartOption();
-                }
                 return;
-            }else{
-                if(this.chackChartInterval){
-                    clearInterval(this.chackChartInterval);
-                }
             }
+
             let ll=this.optionData.length;
             if(ll<1) return;
             let lm=0;
             let subtext=[]
             this.optionData.forEach(px=>{
-                if(px.value>=80){
+                if(px.value>=70){
                     lm+=1;
                     subtext.push(px.name);
                 }
@@ -142,11 +133,11 @@
             let subtextstr='';
             if(subtext.length>0){
                 subtextstr+='\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n';
-                subtextstr+='获得以下省城终身荣誉:\n\n'+subtext.toString();
+                subtextstr+='获得以下省城美食家荣誉:\n\n'+subtext.toString();
             }
-            let title_text='吃遍了 '+ll+' 个省，\n\n你还年轻，努力加油吧'
+            let title_text='你的美食足迹遍及 '+ll+' 个省，\n\n轻轻地你来了，不带走一片美食'
             if(lm>0){
-                title_text='吃遍了 '+ll+' 个省，\n\n被你吃垮了 '+lm+' 个省'
+                title_text='你的美食足迹遍及 '+ll+' 个省，\n\n特别钟情 '+lm+' 个省的美食'
             }
             let cs=[
                 'rgb(230,67,60)','rgb(9,187,7)','rgb(87,107,149)','rgb(255, 87, 10)',
@@ -241,11 +232,14 @@
             //wepy.removeStorage({key:'footData'});
             //this.$broadcast('setQrcode-broadcast');
             this.$invoke('ecCanvas','setQrcode');
+            clearInterval(this.setChartOptionInterval);
+            this.setChartOptionInterval="";
+            wepy.hideLoading();
         }
 
         onShareAppMessage() {
             return {
-                title: '既然走不过人家，咱就吃他个五湖四海',
+                title: '中华美食，博大精深！，\n\n开始绘制我的美食地图',
                 path: '/pages/foot/index?share_openid='+this.openid,
                 success: function(res) {
                     // 转发成功
@@ -266,11 +260,18 @@
             console.log('foot/index-onShow');
             let optionData=wepy.getStorageSync('footData');
             console.log('this.optionData',typeof optionData,this.optionData);
-            if(typeof optionData!='object'){
-                optionData=[];
-            }
             this.optionData=optionData;
-            this.setChartOption();
+            if(optionData.length>0){
+                wepy.showLoading({
+                    title: '正在绘制地图...',
+                    icon: 'loading'
+                })
+            }
+            if(!this.setChartOptionInterval){
+                this.setChartOptionInterval=setInterval(res=>{
+                    this.setChartOption();
+                },500);
+            }
         }
         methods = {
             saveLocalImg(){
