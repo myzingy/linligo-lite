@@ -134,7 +134,7 @@
                     <view class="weui-cell__bd">{{item.name}} （{{item.weight/10}} {{item.weight_unit}}）</view>
                     <view class="weui-cell__ft">
                         <form bindsubmit="removeItem" report-submit="true"
-                              data-item-id="{{item.id}}"
+                              data-item-id="{{item.id}}" data-item-name="{{item.name}}"
                               wx:if="{{purchase.status==0}}">
                             <button class="weui-btn mini-btn" type="default" form-type="submit">
                                 取消
@@ -498,8 +498,15 @@
                     },
                 }
                 let that=this;
+                let checked=wepy.getStorageSync('checked-items-weight-unit') || {};
+                if(checked[e.target.dataset.itemName]){
+                    delete checked[e.target.dataset.itemName];
+                }
+                wepy.setStorageSync('checked-items-weight-unit',checked);
+
                 wepy.request(params).then(function (res) {
                     console.log('purchaseMyOrderSet：', res)
+                    wepy.setStorageSync('purchaseMyOrder',res);
                     that.setActivityOrderData(res);
                 });
             },
